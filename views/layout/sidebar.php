@@ -111,7 +111,7 @@ body {
             <i class="fas fa-user"></i> Profile
         </a>
     
-        <a href="/barangay-inventory/admin/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
+        <a href="/brgy_iba/equipment/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
             <i class="fas fa-box"></i> Equipment
         </a>
         <a href="/barangay-inventory/admin/borrow.php" class="<?= $currentPage == 'borrow.php' ? 'active' : '' ?>">
