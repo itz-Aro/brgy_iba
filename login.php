@@ -106,6 +106,7 @@ if (isset($_SESSION['user'])) {
 </div>
 
 <script>
+  
 document.addEventListener("DOMContentLoaded", function(){
      // Login form submit
     const form = document.getElementById('loginForm');

@@ -111,7 +111,7 @@ body {
         <a href="/barangay-inventory/admin/requests.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
-        <a href="/barangay-inventory/admin/reports.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
+        <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
             <i class="fas fa-chart-line"></i> Reports
         </a>
 
