@@ -105,6 +105,22 @@ $displayRole = htmlspecialchars($role);
 .graph-header{ background:var(--blue); color:white; padding:14px 16px; font-weight:800; display:flex; justify-content:space-between; align-items:center; }
 .graph-body{ padding:18px; }
 .view-large{ display:inline-block; margin-top:12px; background:var(--blue); color:white; border:none; padding:10px 16px; border-radius:10px; font-weight:700; text-decoration:none; }
+.chart-btn {
+  background: #1e73ff;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.chart-btn:hover {
+  background: #165bd1;
+}
+
 /* pagination */
 /* PAGINATION STYLING */
 .activity-footer {
@@ -245,22 +261,29 @@ $displayRole = htmlspecialchars($role);
     <!-- Graph -->
   <div class="right-column">
   <div class="graph-card">
+
     <!-- Chart Header -->
     <div class="graph-header" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-      <!-- Date Display -->
       <div id="chartDate" style="font-size:16px;font-weight:700;">
-        <?php echo date('l, F j Y'); ?>  <!-- e.g. Friday, November 22 2025 -->
+        <?php echo date('l, F j Y'); ?>
       </div>
-      <!-- Optional subtitle -->
       <div style="font-size:13px;opacity:0.9;">Total Borrowed Items</div>
+    </div>
+
+    <!-- SLIDER BUTTONS -->
+    <div style="display: flex; justify-content: space-between; margin: 5px 0 10px 0;">
+      <button id="prevBtn" class="chart-btn">◀</button>
+      <button id="nextBtn" class="chart-btn">▶</button>
     </div>
 
     <div class="graph-body">
       <canvas id="borrowChart" width="300" height="240"></canvas>
       <a class="view-large" href="#">View Large Graph ▸</a>
     </div>
+
   </div>
 </div>
+
 
 
 
@@ -272,20 +295,29 @@ $displayRole = htmlspecialchars($role);
   // chart
 const ctx = document.getElementById('borrowChart').getContext('2d');
 
-let labels = <?= json_encode($chartLabels) ?>;
-let data = <?= json_encode($chartData) ?>;
+const allLabels = <?= json_encode($chartLabels) ?>;
+const allData = <?= json_encode($chartData) ?>;
 
-// 🔥 LIMIT TO 5 BARS ONLY
-labels = labels.slice(0, 5);
-data = data.slice(0, 5);
+let startIndex = 0;
+const visibleBars = 5;
 
-new Chart(ctx, {
+// Return only the visible 5 bars
+function getVisibleData() {
+    return {
+        labels: allLabels.slice(startIndex, startIndex + visibleBars),
+        data: allData.slice(startIndex, startIndex + visibleBars)
+    };
+}
+
+let visible = getVisibleData();
+
+let chart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: labels,
+        labels: visible.labels,
         datasets: [{
             label: 'Borrowed',
-            data: data,
+            data: visible.data,
             backgroundColor: '#1e73ff',
             borderRadius: 6,
             barThickness: 28
@@ -297,14 +329,36 @@ new Chart(ctx, {
             legend: { display: false }
         },
         scales: {
-            x: {
-                grid: { display: false }
-            },
+            x: { grid: { display: false } },
             y: {
                 beginAtZero: true,
-                ticks: { precision:0 }
+                ticks: { precision: 0 }
             }
         }
+    }
+});
+
+// Update chart when sliding
+function updateChart() {
+    const part = getVisibleData();
+    chart.data.labels = part.labels;
+    chart.data.datasets[0].data = part.data;
+    chart.update();
+}
+
+// NEXT
+document.getElementById('nextBtn').addEventListener('click', () => {
+    if (startIndex + visibleBars < allLabels.length) {
+        startIndex++;
+        updateChart();
+    }
+});
+
+// PREVIOUS
+document.getElementById('prevBtn').addEventListener('click', () => {
+    if (startIndex > 0) {
+        startIndex--;
+        updateChart();
     }
 });
 
