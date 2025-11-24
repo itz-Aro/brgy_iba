@@ -23,7 +23,7 @@ body {
     gap: 15px;
     padding: 20px 0;
     transition: all 0.3s ease;
-    background-color: gray;
+
     overflow: hidden;
 }
 
