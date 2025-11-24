@@ -15,7 +15,9 @@ $stmt = $conn->prepare("SELECT * FROM users WHERE id=?");
 $stmt->execute([$userId]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// ===============================
 // 1. Update profile info
+// ===============================
 if (isset($_POST['update_profile'])) {
     $fullname = trim($_POST['fullname']);
     $email = trim($_POST['email']);
@@ -34,15 +36,28 @@ if (isset($_POST['update_profile'])) {
     $successMsg = "Profile updated successfully!";
 }
 
+// ===============================
 // 2. Change avatar
+// ===============================
 if (isset($_POST['change_avatar']) && isset($_FILES['avatar'])) {
     $avatar = $_FILES['avatar'];
     $ext = strtolower(pathinfo($avatar['name'], PATHINFO_EXTENSION));
     $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-// LATER AKO MA CREATE NG UPLOADS
+
     if (in_array($ext, $allowed)) {
-        $avatarName = 'avatar_'.$userId.'_'.time().'.'.$ext;
-        $target = __DIR__.'..\Avatar\uploads'.$avatarName;
+
+        // FILENAME
+        $avatarName = 'avatar_' . $userId . '_' . time() . '.' . $ext;
+
+        // CORRECT UPLOAD DIRECTORY
+        $uploadDir = __DIR__ . '/../Avatar/uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        // TARGET FULL PATH
+        $target = $uploadDir . $avatarName;
+
         if (move_uploaded_file($avatar['tmp_name'], $target)) {
             $conn->prepare("UPDATE users SET avatar=? WHERE id=?")->execute([$avatarName, $userId]);
             $user['avatar'] = $avatarName;
@@ -55,24 +70,31 @@ if (isset($_POST['change_avatar']) && isset($_FILES['avatar'])) {
     }
 }
 
+// ===============================
 // 3. Change username
+// ===============================
 if (isset($_POST['change_username'])) {
     $newUsername = trim($_POST['username']);
 
-    // Check if username exists
     $check = $conn->prepare("SELECT id FROM users WHERE username=? AND id<>?");
     $check->execute([$newUsername, $userId]);
+
     if ($check->rowCount() > 0) {
         $errorMsg = "Username already taken!";
     } else {
-        $conn->prepare("UPDATE users SET username=?, updated_at=NOW() WHERE id=?")->execute([$newUsername, $userId]);
+        $conn->prepare("UPDATE users SET username=?, updated_at=NOW() WHERE id=?")
+             ->execute([$newUsername, $userId]);
+
         $user['username'] = $newUsername;
         $_SESSION['user']['username'] = $newUsername;
+
         $successMsg = "Username updated!";
     }
 }
 
+// ===============================
 // 4. Change password
+// ===============================
 if (isset($_POST['change_password'])) {
     $current = $_POST['current_password'];
     $new = $_POST['new_password'];
@@ -84,19 +106,20 @@ if (isset($_POST['change_password'])) {
         $errorMsg = "New passwords do not match!";
     } else {
         $hash = password_hash($new, PASSWORD_DEFAULT);
-        $conn->prepare("UPDATE users SET password=?, updated_at=NOW() WHERE id=?")->execute([$hash, $userId]);
+        $conn->prepare("UPDATE users SET password=?, updated_at=NOW() WHERE id=?")
+             ->execute([$hash, $userId]);
+
         $successMsg = "Password changed successfully!";
     }
 }
-?>
 
+?>
 
 <?php require_once __DIR__ . '../views/layout/sidebar.php'; ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* Container */
 .profile-container {
     max-width: 900px;
     margin: 30px auto;
@@ -106,7 +129,6 @@ if (isset($_POST['change_password'])) {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* Header */
 .profile-header {
     display: flex;
     align-items: center;
@@ -128,11 +150,9 @@ if (isset($_POST['change_password'])) {
     margin: 0;
 }
 
-/* Success/Error messages */
 .success { color: #1b8b1b; margin-bottom: 15px; font-weight: bold; }
 .error { color: #d32f2f; margin-bottom: 15px; font-weight: bold; }
 
-/* Forms Grid */
 .profile-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -180,46 +200,48 @@ if (isset($_POST['change_password'])) {
     gap: 8px;
 }
 
-/* Full width for smaller screens */
 @media (max-width: 768px) {
-    .profile-grid {
-        grid-template-columns: 1fr;
-    }
+    .profile-grid { grid-template-columns: 1fr; }
 }
-.content-wrap{ margin-left:250px; padding:22px; max-width:1500px; margin-top:0px; }
 
+.content-wrap {
+    margin-left:250px;
+    padding:22px;
+    max-width:1500px;
+}
 </style>
 
 <main class="content-wrap">
     <div class="profile-container">
-        <!-- Header -->
+
+        <!-- HEADER WITH DEFAULT AVATAR FALLBACK -->
         <div class="profile-header">
             <img 
-                src="<?= $user['avatar'] 
-                        ? '/brgy_iba/Avatar/' . $user['avatar'] 
-                        : '/public/assets/default-avatar.png' ?>" 
+                src="Avatar/profile.png" 
                 class="avatar-preview" 
                 alt="Avatar"
             >
             <h2><?= htmlspecialchars($user['fullname']) ?></h2>
         </div>
 
-        <!-- Messages -->
+        <!-- MESSAGES -->
         <?php if(isset($successMsg)) echo "<p class='success'>$successMsg</p>"; ?>
         <?php if(isset($errorMsg)) echo "<p class='error'>$errorMsg</p>"; ?>
 
         <div class="profile-grid">
 
-            <!-- Avatar Card -->
+            <!-- CHANGE AVATAR -->
             <div class="profile-card">
                 <h3><i class="fa-solid fa-image"></i> Change Avatar</h3>
                 <form method="post" enctype="multipart/form-data">
                     <input type="file" name="avatar" accept="image/*">
-                    <button type="submit" name="change_avatar" class="upload-btn"><i class="fa-solid fa-upload"></i> Upload</button>
+                    <button type="submit" name="change_avatar" class="upload-btn">
+                        <i class="fa-solid fa-upload"></i> Upload
+                    </button>
                 </form>
             </div>
 
-            <!-- Edit Profile Card -->
+            <!-- EDIT PROFILE -->
             <div class="profile-card">
                 <h3><i class="fa-solid fa-user"></i> Edit Profile</h3>
                 <form method="post">
@@ -231,23 +253,27 @@ if (isset($_POST['change_password'])) {
                 </form>
             </div>
 
-            <!-- Change Username Card -->
+            <!-- CHANGE USERNAME -->
             <div class="profile-card">
                 <h3><i class="fa-solid fa-user-tag"></i> Change Username</h3>
                 <form method="post">
                     <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required>
-                    <button type="submit" name="change_username"><i class="fa-solid fa-pen"></i> Change Username</button>
+                    <button type="submit" name="change_username">
+                        <i class="fa-solid fa-pen"></i> Change Username
+                    </button>
                 </form>
             </div>
 
-            <!-- Change Password Card -->
+            <!-- CHANGE PASSWORD -->
             <div class="profile-card">
                 <h3><i class="fa-solid fa-lock"></i> Change Password</h3>
                 <form method="post">
                     <input type="password" name="current_password" placeholder="Current Password" required>
                     <input type="password" name="new_password" placeholder="New Password" required>
                     <input type="password" name="confirm_password" placeholder="Confirm New Password" required>
-                    <button type="submit" name="change_password"><i class="fa-solid fa-key"></i> Change Password</button>
+                    <button type="submit" name="change_password">
+                        <i class="fa-solid fa-key"></i> Change Password
+                    </button>
                 </form>
             </div>
 
