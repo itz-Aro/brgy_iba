@@ -55,8 +55,8 @@
         .quantity { display: flex; align-items: center; gap: 0.3rem; }
         .quantity button { padding: 0.2rem 0.5rem; border: 1px solid #ccc; background: #f0f0f0; cursor: pointer; }
 
-        .success { text-align: center; padding: 2rem; }
-        .success img { width: 60px; margin-bottom: 1rem; }
+        .success { text-align: center; padding: 0rem; width: 100%; display:flex; flex-direction:column; gap:15px; }
+        .success i { font-size: 4rem; }
 
     </style>
 </head>
@@ -120,7 +120,7 @@
         </div>
 
         <div class="equipment-item">
-            <img src="https://via.placeholder.com/60" alt="Tent">
+            <img src="\brgy_iba\equipment\equipment_img\tent.png" alt="Tent">
             <span>Tent</span>
             <div class="quantity">
                 <button type="button" onclick="changeQty(this,-1)">-</button>
@@ -135,7 +135,7 @@
 
 <div class="form-container hidden" id="step3">
     <div class="success">
-        <img src="https://via.placeholder.com/60?text=%E2%9C%93" alt="Success">
+        <i class="fa-solid fa-circle-check" style="color: #00c853;"></i>
         <h2>Request Submitted!</h2>
         <p>We’ll notify you through Email or SMS regarding your request. Thank you!</p>
         <button class="button" onclick="resetForm()">Okay</button>
