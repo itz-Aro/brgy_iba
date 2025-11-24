@@ -1,0 +1,119 @@
+.logout-btn { margin-top:15px; display:block; width:100%; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: rgb(201, 201, 201);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
+.login-container {
+    height: 480px;
+    width: 360px;
+    /* padding: 70px 0; */
+    background-color: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.login-logo {
+    display: flex;
+    justify-content: center;
+    height: 27%;
+    width: 100%;
+}
+
+.login-logo .img {
+    height: 100%;
+    width: 100%;
+}
+
+.login-text {
+    width: 100%;
+    text-align: center;
+}
+
+.login-text h1 {
+    text-transform: uppercase;
+}
+
+.msg { margin-top:15px; min-height:20px; color:#d32f2f; font-weight:500; }
+
+
+.login-text p {
+    color: rgb(6, 169, 0);
+}
+.login-input {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+    position: relative;
+}
+
+
+.input-field {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.input-field input {
+    font-family: 'Poppins', sans-serif;
+    width: 80%;
+    padding: 13px;
+    border-radius: 5px;
+    border: 2px solid #acacac;
+}
+
+.placeholder {
+    position: absolute;
+    left: 50px;
+    top: 13px;
+    font-size: 14px;
+    color: #8b8b8b;
+    pointer-events: none;
+    transition: 0.3s ease;
+    background-color: transparent;
+    padding: 0 5px;
+}
+
+.input-field input:focus + .placeholder,
+.input-field input:not(:placeholder-shown) + .placeholder {
+    top: -9px;
+    font-size: 13px;
+    background-color: white;
+}
+
+input:focus {
+    border-color: #083d92;
+    outline: none;
+}
+
+button {
+    width: 80%;
+    padding: 13px;
+    border-radius: 5px;
+    background-color: #083d92;
+    border: none;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+
+}
+
+
+
