@@ -108,9 +108,6 @@ body {
             <i class="fas fa-home"></i> Dashboard
         </a>
 
-        <!-- <a href="/barangay-inventory/admin/return.php" class="<?= $currentPage == 'return.php' ? 'active' : '' ?>">
-            <i class="fas fa-undo"></i> Returned Items
-        </a> -->
         <a href="/barangay-inventory/admin/requests.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
@@ -126,16 +123,6 @@ body {
         <a href="/brgy_iba/equipment/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
             <i class="fas fa-box"></i> Manage Stocks
         </a>
-
-        <!-- <a href="/barangay-inventory/official/stocks.php" class="<?= $currentPage == 'stocks.php' ? 'active' : '' ?>">
-            <i class="fas fa-boxes"></i> Manage Stocks
-        </a> -->
-        <!-- <a href="/barangay-inventory/official/request.php" class="<?= $currentPage == 'request.php' ? 'active' : '' ?>">
-            <i class="fas fa-file-alt"></i> Request Item
-        </a> -->
-        <!-- <a href="/barangay-inventory/official/my-requests.php" class="<?= $currentPage == 'my-requests.php' ? 'active' : '' ?>">
-            <i class="fas fa-list"></i> My Requests
-        </a> -->
     <?php endif; ?>
     
     <a href="/brgy_iba/profile.php" class="<?= $currentPage == 'profile.php' ? 'active' : '' ?>">
