@@ -259,7 +259,7 @@ if (isset($_POST['change_password'])) {
                 <form method="post">
                     <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required>
                     <button type="submit" name="change_username">
-                        <i class="fa-solid fa-pen"></i> Change Username
+                        <i class="fa-solid fa-pen"></i> Change Usernames
                     </button>
                 </form>
             </div>
