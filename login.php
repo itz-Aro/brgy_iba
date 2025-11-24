@@ -106,20 +106,38 @@ if (isset($_SESSION['user'])) {
 </div>
 
 <script>
-  
 document.addEventListener("DOMContentLoaded", function(){
-     // Login form submit
+
     const form = document.getElementById('loginForm');
     const msg = document.getElementById('msg');
+    const loginContainer = document.querySelector('.login-container');
+
+    // Adjust container height dynamically
+    function adjustContainer() {
+        // Show message only if there is text
+        if(msg.textContent.trim() !== '') {
+            msg.style.display = 'block';
+        } else {
+            msg.style.display = 'none';
+        }
+
+        // Reset and measure height
+        loginContainer.style.height = 'auto';
+        const totalHeight = loginContainer.scrollHeight;
+        loginContainer.style.height = totalHeight + 'px';
+    }
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
+
         msg.textContent = '';
+        adjustContainer(); // compact container initially
 
         if (!username || !password) {
             msg.textContent = 'Enter username and password';
+            adjustContainer(); // expand container
             return;
         }
 
@@ -130,123 +148,124 @@ document.addEventListener("DOMContentLoaded", function(){
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
+
             if (data.success) {
                 const role = data.user.role.toLowerCase();
                 if (role === 'admin') window.location.href = './admin/dashboard.php';
                 else if (role === 'official') window.location.href = './officials/dashboard.php';
-                else msg.textContent = 'Role not recognized';
+                else {
+                    msg.textContent = 'Role not recognized';
+                    adjustContainer();
+                }
             } else {
                 msg.textContent = data.error || 'Invalid credentials';
+                adjustContainer();
             }
         } catch (err) {
             console.error(err);
             msg.textContent = 'Connection error. Please try again.';
+            adjustContainer();
         }
     });
 
-  const resetModal = document.getElementById("resetModal");
-  const stepEmail = document.getElementById("stepEmail");
-  const stepCode = document.getElementById("stepCode");
-  const stepReset = document.getElementById("stepReset");
+    // --- Forgot Password modal code remains unchanged ---
+    const resetModal = document.getElementById("resetModal");
+    const stepEmail = document.getElementById("stepEmail");
+    const stepCode = document.getElementById("stepCode");
+    const stepReset = document.getElementById("stepReset");
 
-  const forgotEmail = document.getElementById("forgotEmail");
-  const forgotMsg = document.getElementById("forgotMsg");
-  const verifyCodeInput = document.getElementById("verifyCode");
-  const verifyMsg = document.getElementById("verifyMsg");
-  const newPass = document.getElementById("newPass");
-  const confirmPass = document.getElementById("confirmPass");
-  const resetMsg = document.getElementById("resetMsg");
+    const forgotEmail = document.getElementById("forgotEmail");
+    const forgotMsg = document.getElementById("forgotMsg");
+    const verifyCodeInput = document.getElementById("verifyCode");
+    const verifyMsg = document.getElementById("verifyMsg");
+    const newPass = document.getElementById("newPass");
+    const confirmPass = document.getElementById("confirmPass");
+    const resetMsg = document.getElementById("resetMsg");
 
-  // Show modal
-  document.getElementById("forgotLink").onclick = () => {
-    resetModal.style.display = "flex";
-    stepEmail.style.display = "block";
-    stepCode.style.display = "none";
-    stepReset.style.display = "none";
-    forgotMsg.textContent = "";
-    forgotEmail.value = "";
-  };
+    document.getElementById("forgotLink").onclick = () => {
+        resetModal.style.display = "flex";
+        stepEmail.style.display = "block";
+        stepCode.style.display = "none";
+        stepReset.style.display = "none";
+        forgotMsg.textContent = "";
+        forgotEmail.value = "";
+    };
 
-  // Close buttons
-  document.getElementById("closeModalEmail").onclick = () => resetModal.style.display="none";
-  document.getElementById("closeModalCode").onclick = () => resetModal.style.display="none";
-  document.getElementById("closeModalReset").onclick = () => resetModal.style.display="none";
+    document.getElementById("closeModalEmail").onclick = 
+    document.getElementById("closeModalCode").onclick = 
+    document.getElementById("closeModalReset").onclick = () => resetModal.style.display="none";
 
-  // Step 1: Send code
-  document.getElementById("sendCodeBtn").onclick = async () => {
-    const email = forgotEmail.value.trim();
-    forgotMsg.style.color="red";
-    if(!email){ forgotMsg.textContent="Enter your email"; return; }
+    document.getElementById("sendCodeBtn").onclick = async () => {
+        const email = forgotEmail.value.trim();
+        forgotMsg.style.color="red";
+        if(!email){ forgotMsg.textContent="Enter your email"; return; }
 
-    try {
-      const res = await fetch("api/check_email.php", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({email})
-      });
-      const data = await res.json();
-      if(!data.exists){ forgotMsg.textContent="Email not found"; return; }
+        try {
+            const res = await fetch("api/check_email.php", {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({email})
+            });
+            const data = await res.json();
+            if(!data.exists){ forgotMsg.textContent="Email not found"; return; }
 
-      const code = Math.floor(100000 + Math.random()*900000);
-      sessionStorage.setItem("reset_email", email);
-      sessionStorage.setItem("reset_code", code);
+            const code = Math.floor(100000 + Math.random()*900000);
+            sessionStorage.setItem("reset_email", email);
+            sessionStorage.setItem("reset_code", code);
 
-      await emailjs.send("service_yuq9rnq","template_lejynq9",{verification_code:code, to_email:email});
-      forgotMsg.style.color="green";
-      forgotMsg.textContent="Code sent!";
+            await emailjs.send("service_yuq9rnq","template_lejynq9",{verification_code:code, to_email:email});
+            forgotMsg.style.color="green";
+            forgotMsg.textContent="Code sent!";
 
-      // Next step
-      setTimeout(()=>{
-        stepEmail.style.display="none";
-        stepCode.style.display="block";
-        verifyCodeInput.value="";
-        verifyMsg.textContent="";
-      },800);
+            setTimeout(()=>{
+                stepEmail.style.display="none";
+                stepCode.style.display="block";
+                verifyCodeInput.value="";
+                verifyMsg.textContent="";
+            },800);
 
-    } catch(err){ console.error(err); forgotMsg.textContent="Error sending code"; }
-  };
+        } catch(err){ console.error(err); forgotMsg.textContent="Error sending code"; }
+    };
 
-  // Step 2: Verify code
-  document.getElementById("verifyBtn").onclick = () => {
-    const inputCode = verifyCodeInput.value.trim();
-    const sessionCode = sessionStorage.getItem("reset_code");
-    verifyMsg.style.color="red";
+    document.getElementById("verifyBtn").onclick = () => {
+        const inputCode = verifyCodeInput.value.trim();
+        const sessionCode = sessionStorage.getItem("reset_code");
+        verifyMsg.style.color="red";
 
-    if(!inputCode){ verifyMsg.textContent="Enter the code"; return; }
-    if(inputCode!==sessionCode){ verifyMsg.textContent="Invalid code"; return; }
+        if(!inputCode){ verifyMsg.textContent="Enter the code"; return; }
+        if(inputCode!==sessionCode){ verifyMsg.textContent="Invalid code"; return; }
 
-    // Next step
-    stepCode.style.display="none";
-    stepReset.style.display="block";
-    newPass.value=""; confirmPass.value=""; resetMsg.textContent="";
-  };
+        stepCode.style.display="none";
+        stepReset.style.display="block";
+        newPass.value=""; confirmPass.value=""; resetMsg.textContent="";
+    };
 
-  // Step 3: Reset password
-  document.getElementById("resetBtn").onclick = async () => {
-    resetMsg.style.color="red";
-    const np = newPass.value.trim();
-    const cp = confirmPass.value.trim();
-    if(!np || !cp){ resetMsg.textContent="Fill both fields"; return; }
-    if(np!==cp){ resetMsg.textContent="Passwords do not match"; return; }
+    document.getElementById("resetBtn").onclick = async () => {
+        resetMsg.style.color="red";
+        const np = newPass.value.trim();
+        const cp = confirmPass.value.trim();
+        if(!np || !cp){ resetMsg.textContent="Fill both fields"; return; }
+        if(np!==cp){ resetMsg.textContent="Passwords do not match"; return; }
 
-    const email = sessionStorage.getItem("reset_email");
+        const email = sessionStorage.getItem("reset_email");
 
-    try{
-      const res = await fetch("api/reset_password.php",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({email,password:np})
-      });
-      const data = await res.json();
-      if(data.success){
-        resetMsg.style.color="green";
-        resetMsg.textContent="Password reset successfully! Redirecting...";
-        setTimeout(()=>window.location.href="login.php",2000);
-      } else { resetMsg.textContent = data.error || "Failed to reset password"; }
-    } catch(err){ console.error(err); resetMsg.textContent="Connection error"; }
-  };
+        try{
+            const res = await fetch("api/reset_password.php",{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body: JSON.stringify({email,password:np})
+            });
+            const data = await res.json();
+            if(data.success){
+                resetMsg.style.color="green";
+                resetMsg.textContent="Password reset successfully! Redirecting...";
+                setTimeout(()=>window.location.href="login.php",2000);
+            } else { resetMsg.textContent = data.error || "Failed to reset password"; }
+        } catch(err){ console.error(err); resetMsg.textContent="Connection error"; }
+    };
 
 });
+
 </script>
 </body>
 </html>
