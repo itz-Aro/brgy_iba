@@ -108,7 +108,7 @@ body {
             <i class="fas fa-home"></i> Dashboard
         </a>
 
-        <a href="/barangay-inventory/admin/requests.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
+        <a href="\brgy_iba\approval\requests_pending.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
         <a href="/barangay-inventory/admin/reports.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
