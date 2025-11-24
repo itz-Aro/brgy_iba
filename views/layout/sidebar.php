@@ -107,9 +107,6 @@ body {
         <a href="/brgy_iba/admin/dashboard.php" class="<?= $currentPage == 'dashboard.php' ? 'active' : '' ?>">
             <i class="fas fa-home"></i> Dashboard
         </a>
-        <a href="/brgy_iba/profile.php" class="<?= $currentPage == 'profile.php' ? 'active' : '' ?>">
-            <i class="fas fa-user"></i> Profile
-        </a>
     
         <a href="/brgy_iba/equipment/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
             <i class="fas fa-box"></i> Equipment
@@ -138,7 +135,11 @@ body {
             <i class="fas fa-list"></i> My Requests
         </a>
     <?php endif; ?>
-
+    
+    <a href="/brgy_iba/profile.php" class="<?= $currentPage == 'profile.php' ? 'active' : '' ?>">
+            <i class="fas fa-user"></i> Profile
+        </a>
+        
     <a href="/brgy_iba/logout.php">
         <i class="fas fa-sign-out-alt"></i> Logout
     </a>
