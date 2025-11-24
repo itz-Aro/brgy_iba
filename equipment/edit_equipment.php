@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="/public/css/dashboard.css">
 
 <style>
-.content-wrap{ margin-left:250px; padding:22px; max-width:900px; }
+.content-wrap{ margin-left:430px; padding:22px; max-width:900px; }
 .top-header{ background:#0d47a1; color:white; border-radius:12px; padding:24px 30px;
  display:flex; justify-content:space-between; align-items:center; }
 .title{ font-size:36px; font-weight:800; }
