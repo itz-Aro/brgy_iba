@@ -110,9 +110,7 @@ body {
         <a href="/brgy_iba/profile.php" class="<?= $currentPage == 'profile.php' ? 'active' : '' ?>">
             <i class="fas fa-user"></i> Profile
         </a>
-        <a href="/barangay-inventory/admin/users.php" class="<?= $currentPage == 'users.php' ? 'active' : '' ?>">
-            <i class="fas fa-users"></i> Manage Officials
-        </a>
+    
         <a href="/barangay-inventory/admin/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
             <i class="fas fa-box"></i> Equipment
         </a>
