@@ -272,8 +272,12 @@ $displayRole = htmlspecialchars($role);
   // chart
 const ctx = document.getElementById('borrowChart').getContext('2d');
 
-const labels = <?= json_encode($chartLabels) ?>; // e.g. ['11-16','11-17',...]
-const data = <?= json_encode($chartData) ?>;      // e.g. [2,3,1,0,4,1,2]
+let labels = <?= json_encode($chartLabels) ?>;
+let data = <?= json_encode($chartData) ?>;
+
+// 🔥 LIMIT TO 5 BARS ONLY
+labels = labels.slice(0, 5);
+data = data.slice(0, 5);
 
 new Chart(ctx, {
     type: 'bar',
@@ -303,6 +307,7 @@ new Chart(ctx, {
         }
     }
 });
+
 
 
 const activityList = document.getElementById('activityList');
