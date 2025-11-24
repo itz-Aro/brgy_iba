@@ -1,10 +1,3 @@
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Simulate saving the form data (e.g., database)
-    $success = true;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,29 +5,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brgy Iba East Equipment Request</title>
     
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #ccc; }
-        .form-container { background: #fff; padding: 2rem; border-radius: 8px; width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background: #ccc; 
+            padding: 20px;
+        }
+
+        .form-container { 
+            background: #fff; 
+            padding: 2rem; 
+            border-radius: 8px; 
+            width: 500px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            
+            /* NEW: Make container scrollable */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* OPTIONAL: nice scrollbar */
+        .form-container::-webkit-scrollbar { width: 6px; }
+        .form-container::-webkit-scrollbar-track { background: #f1f1f1; }
+        .form-container::-webkit-scrollbar-thumb { background: #bbb; border-radius: 10px; }
+        .form-container::-webkit-scrollbar-thumb:hover { background: #999; }
+
         .logo { text-align: center; margin-bottom: 1rem; }
         .logo img { width: 80px; }
         h1 { text-align: center; margin-bottom: 1rem; font-size: 1.2rem; }
-        label { display: block; margin-top: 1rem; margin-bottom: 0.3rem; font-weight: 600; }
-        input[type="text"], input[type="email"], input[type="number"], input[type="date"], textarea { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+        label { display: block; margin-top: 1rem; margin-bottom: 0.3rem; font-weight: 400; }
+        input[type="text"], input[type="email"], input[type="number"], input[type="date"], textarea { 
+            width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; 
+        }
         .row { display: flex; gap: 0.5rem; }
         .row input { flex: 1; }
         .button { width: 100%; padding: 0.7rem; background: #0066ff; color: #fff; border: none; border-radius: 4px; margin-top: 1rem; cursor: pointer; font-weight: 600; }
         .button:hover { background: #0052cc; }
         .hidden { display: none; }
+
         .equipment-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-        .equipment-item img { width: 60px; border-radius: 4px; margin-right: 1rem; }
+        .equipment-item img { width: 60px; border-radius: 4px; margin-right: 1rem; border:2px solid black; }
         .quantity { display: flex; align-items: center; gap: 0.3rem; }
         .quantity button { padding: 0.2rem 0.5rem; border: 1px solid #ccc; background: #f0f0f0; cursor: pointer; }
+
         .success { text-align: center; padding: 2rem; }
         .success img { width: 60px; margin-bottom: 1rem; }
+
     </style>
 </head>
 <body>
@@ -77,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form id="equipmentForm">
         <div class="equipment-item">
-            <img src="https://via.placeholder.com/60" alt="Chair">
+            <img src="\brgy_iba\equipment\equipment_img\chair.png" alt="Chair">
             <span>Chair</span>
             <div class="quantity">
                 <button type="button" onclick="changeQty(this,-1)">-</button>
@@ -87,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="equipment-item">
-            <img src="https://via.placeholder.com/60" alt="Table">
+            <img src="\brgy_iba\equipment\equipment_img\table.png" alt="Table">
             <span>Table</span>
             <div class="quantity">
                 <button type="button" onclick="changeQty(this,-1)">-</button>
