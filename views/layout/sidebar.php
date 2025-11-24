@@ -114,9 +114,6 @@ body {
         <a href="/brgy_iba/equipment/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
             <i class="fas fa-box"></i> Equipment
         </a>
-        <a href="/barangay-inventory/admin/borrow.php" class="<?= $currentPage == 'borrow.php' ? 'active' : '' ?>">
-            <i class="fas fa-hand-holding"></i> Borrowed Items
-        </a>
         <a href="/barangay-inventory/admin/return.php" class="<?= $currentPage == 'return.php' ? 'active' : '' ?>">
             <i class="fas fa-undo"></i> Returned Items
         </a>
