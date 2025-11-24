@@ -23,6 +23,7 @@ body {
     gap: 15px;
     padding: 20px 0;
     transition: all 0.3s ease;
+    background-color: gray;
     overflow: hidden;
 }
 
@@ -33,7 +34,7 @@ body {
 }
 
 .login-logo img {
-    width: 100px; /* adjust logo size */
+    width: 100px;
     height: auto;
     object-fit: contain;
 }
@@ -43,17 +44,6 @@ body {
     text-align: center;
 }
 
-/* .login-text h1 {
-    text-transform: uppercase;
-    font-size: 1.6rem;
-}
-
-.msg {
-    margin-top: 10px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    color: #d32f2f;
-} */
 
 .login-text h1 {
     text-transform: uppercase;
