@@ -186,6 +186,8 @@ if (isset($_POST['change_password'])) {
         grid-template-columns: 1fr;
     }
 }
+.content-wrap{ margin-left:250px; padding:22px; max-width:1500px; margin-top:0px; }
+
 </style>
 
 <main class="content-wrap">
