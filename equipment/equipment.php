@@ -26,7 +26,7 @@ $displayRole = htmlspecialchars($role);
   --card-shadow:0 6px 14px rgba(15,23,42,0.12);
   --radius:14px;
 }
-.content-wrap{ margin-left:350px; padding:22px; max-width:1500px; margin-top:0px;}
+.content-wrap{ margin-left:250px; padding:22px; max-width:1500px; margin-top:0px;}
 .top-header{ margin-bottom:10px;background:var(--blue); color:white; border-radius:12px; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 14px rgba(0,0,0,0.12);}
 .top-header .title{ font-size:44px; font-weight:800; letter-spacing:-0.5px; }
 .admin-area{ display:flex; align-items:center; gap:18px; }

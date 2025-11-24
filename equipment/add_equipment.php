@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <link rel="stylesheet" href="/public/css/dashboard.css">
 <style>
-.content-wrap{ margin-left:250px; padding:22px; max-width:900px; margin-top:0px; }
+.content-wrap{ margin-left:250px; padding:22px; max-width:900px; margin-top:0px; display:flex; align-items:center; justify-content:center; flex-direction:column;  }
 .top-header{ background:#0d47a1; color:white; border-radius:12px; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 14px rgba(0,0,0,0.12);}
 .top-header .title{ font-size:44px; font-weight:800; letter-spacing:-0.5px; }
 .admin-area{ display:flex; align-items:center; gap:18px; }
