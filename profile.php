@@ -194,7 +194,13 @@ if (isset($_POST['change_password'])) {
     <div class="profile-container">
         <!-- Header -->
         <div class="profile-header">
-            <img src="<?= $user['avatar'] ? '/public/uploads/'.$user['avatar'] : '/public/assets/default-avatar.png' ?>" class="avatar-preview" alt="Avatar">
+            <img 
+                src="<?= $user['avatar'] 
+                        ? '/brgy_iba/Avatar/' . $user['avatar'] 
+                        : '/public/assets/default-avatar.png' ?>" 
+                class="avatar-preview" 
+                alt="Avatar"
+            >
             <h2><?= htmlspecialchars($user['fullname']) ?></h2>
         </div>
 
