@@ -191,10 +191,11 @@ $displayRole = htmlspecialchars($role);
 
   <!-- Filter Buttons -->
   <div class="filter-buttons">
-    <a href="?status=Pending" class="pending <?= $status=='Pending'?'active':'' ?>">Pending</a>
-    <a href="?status=Approved" class="approved <?= $status=='Approved'?'active':'' ?>">Approved</a>
-    <a href="?status=Not Available" class="not-available <?= $status=='Not Available'?'active':'' ?>">Not Available</a>
-  </div>
+  <a href="?status=Pending"     class="pending <?= $status=='Pending'?'active':'' ?>">Pending</a>
+  <a href="?status=Approved"    class="approved <?= $status=='Approved'?'active':'' ?>">Approved</a>
+  <a href="?status=Declined"    class="not-available <?= $status=='Declined'?'active':'' ?>">Declined</a>
+</div>
+
 
   <!-- Request Cards -->
   <?php if($requests): ?>

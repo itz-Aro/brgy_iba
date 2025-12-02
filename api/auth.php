@@ -25,36 +25,6 @@ try {
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user) {
-        // Log failed login (non-existent username)
-        $logStmt = $conn->prepare("
-            INSERT INTO audit_logs (user_id, action, resource_type, resource_id, details, ip_address)
-            VALUES (NULL, 'failed_login', 'user', NULL, :details, :ip)
-        ");
-        $logStmt->execute([
-            ':details' => "Attempted login with non-existent username: $username",
-            ':ip' => $_SERVER['REMOTE_ADDR']
-        ]);
-
-        echo json_encode(['success' => false, 'error' => 'User not found']);
-        exit;
-    }
-
-    if (!password_verify($password, $user['password'])) {
-        // Log failed login (wrong password)
-        $logStmt = $conn->prepare("
-            INSERT INTO audit_logs (user_id, action, resource_type, resource_id, details, ip_address)
-            VALUES (:user_id, 'failed_login', 'user', :user_id, :details, :ip)
-        ");
-        $logStmt->execute([
-            ':user_id' => $user['id'],
-            ':details' => 'Incorrect password attempt',
-            ':ip' => $_SERVER['REMOTE_ADDR']
-        ]);
-
-        echo json_encode(['success' => false, 'error' => 'Incorrect password']);
-        exit;
-    }
 
     // Successful login
     $_SESSION['user'] = [
@@ -64,16 +34,7 @@ try {
         'role' => strtolower($user['role'])
     ];
 
-    // Log successful login
-    $logStmt = $conn->prepare("
-        INSERT INTO audit_logs (user_id, action, resource_type, resource_id, details, ip_address)
-        VALUES (:user_id, 'login', 'user', :user_id, :details, :ip)
-    ");
-    $logStmt->execute([
-        ':user_id' => $user['id'],
-        ':details' => 'User logged in successfully',
-        ':ip' => $_SERVER['REMOTE_ADDR']
-    ]);
+ 
 
     echo json_encode(['success' => true, 'user' => $_SESSION['user']]);
 

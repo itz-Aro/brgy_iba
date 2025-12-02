@@ -37,29 +37,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $condition = $_POST['condition'];
     $location = $_POST['location'];
 
-    // PHOTO UPLOAD
-    $photo = $equipment['photo']; // default: keep old photo
+   // PHOTO UPLOAD
+$photo = $equipment['photo']; // keep old photo if no file is uploaded
 
-    if (!empty($_FILES['photo']['name'])) {
-        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-        $photo = 'uploads/' . uniqid() . '.' . $ext;
-        move_uploaded_file($_FILES['photo']['tmp_name'], __DIR__ . '/../public/' . $photo);
+if (!empty($_FILES['photo']['name'])) {
+    $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+    $photo = uniqid() . '.' . $ext; 
+
+    $uploadPath = __DIR__ . '/equipment_img/' . $photo;
+
+    // Create folder if not exists
+    if (!is_dir(__DIR__ . '/equipment_img')) {
+        mkdir(__DIR__ . '/equipment_img', 0777, true);
     }
 
-    // UPDATE QUERY
-    $stmt = $conn->prepare("
-        UPDATE equipment SET
-            code = ?, name = ?, description = ?, category = ?, 
-            total_quantity = ?, available_quantity = ?, 
-            condition = ?, location = ?, photo = ?
-        WHERE id = ?
-    ");
+    move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
 
-    $res = $stmt->execute([
-        $code, $name, $description, $category,
-        $total_quantity, $available_quantity,
-        $condition, $location, $photo, $id
-    ]);
+    // Store only filename in DB
+    $photo = "equipment_img/" . $photo;
+}
+
+
+   $stmt = $conn->prepare("
+    UPDATE equipment SET
+        code = ?, name = ?, description = ?, category = ?, 
+        total_quantity = ?, available_quantity = ?, 
+        `condition` = ?, location = ?, photo = ?
+    WHERE id = ?
+");
+
+$res = $stmt->execute([
+    $code, $name, $description, $category,
+    $total_quantity, $available_quantity,
+    $condition, $location, $photo, $id
+]);
+
 
     if ($res) {
         $success = "Equipment updated successfully!";

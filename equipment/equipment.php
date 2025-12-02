@@ -80,7 +80,7 @@ $displayRole = htmlspecialchars($role);
       <?php if(!empty($equipments)): ?>
         <?php foreach($equipments as $eq): ?>
         <tr>
-          <td><img src="<?= htmlspecialchars($eq['photo'] ?: '/public/imgs/default.png') ?>" alt="Photo"></td>
+          <td><img src="equipment_img/<?= htmlspecialchars($eq['photo'] ?: 'default.png') ?>" alt="Photo"></td>
           <td><?= htmlspecialchars($eq['code']) ?></td>
           <td><?= htmlspecialchars($eq['name']) ?></td>
           <td><?= htmlspecialchars($eq['category']) ?></td>

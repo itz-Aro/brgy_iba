@@ -25,16 +25,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $created_by = $_SESSION['user']['id'] ?? null;
 
     // Handle photo upload
-    $photo = '';
-    if (!empty($_FILES['photo']['name'])) {
-        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-        $photo = 'uploads/' . uniqid() . '.' . $ext;
-        move_uploaded_file($_FILES['photo']['tmp_name'], __DIR__ . '/../public/' . $photo);
+   // Handle photo upload
+// Handle photo upload and save inside equipment_img folder
+$photo = '';
+if (!empty($_FILES['photo']['name'])) {
+
+    $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+    $photo = uniqid() . '.' . $ext; // file name only
+
+    $uploadPath = __DIR__ . '/equipment_img/' . $photo; // full directory path
+
+    // create folder if missing
+    if (!is_dir(__DIR__ . '/equipment_img')) {
+        mkdir(__DIR__ . '/equipment_img', 0777, true);
     }
 
-    // Insert into DB
-    $stmt = $conn->prepare("INSERT INTO equipment (code,name,description,category,total_quantity,available_quantity,condition,location,photo,created_by) VALUES (?,?,?,?,?,?,?,?,?,?)");
-    $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$available_quantity,$condition,$location,$photo,$created_by]);
+    move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
+}
+
+
+// FIXED SQL
+$stmt = $conn->prepare("INSERT INTO equipment 
+(code,name,description,category,total_quantity,available_quantity,`condition`,location,photo,created_by) 
+VALUES (?,?,?,?,?,?,?,?,?,?)");
+
+$res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$available_quantity,$condition,$location,$photo,$created_by]);
 
     if($res) $success = "Equipment successfully added!";
     else $error = "Failed to add equipment. Please try again.";
