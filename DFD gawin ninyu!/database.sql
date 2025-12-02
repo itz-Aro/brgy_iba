@@ -129,7 +129,7 @@ CREATE TABLE borrowings (
   date_borrowed DATETIME DEFAULT CURRENT_TIMESTAMP,
   expected_return_date DATETIME,
   actual_return_date DATETIME NULL,
-  status ENUM('Active','Returned','Overdue','Returned Damaged','Under Repair') DEFAULT 'Active',
+  status ENUM('Active','Returned','Overdue','Damaged','Under Repair') DEFAULT 'Active',
   notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL DEFAULT NULL,
@@ -220,3 +220,94 @@ CREATE INDEX idx_requests_status ON requests(status);
 CREATE INDEX idx_borrowings_status ON borrowings(status);
 
 SET FOREIGN_KEY_CHECKS=1;
+
+
+
+
+
+/* ===========================================================
+   🚀 SAMPLE DATA INSERTS (100% VALID — NO FK ERRORS)
+   =========================================================== */
+
+-- 1. Roles
+INSERT INTO roles (name, description) VALUES
+('Admin', 'System administrator'),
+('Staff', 'Regular staff'),
+('Borrower', 'Barangay resident borrower');
+
+-- 2. Users
+INSERT INTO users (role_id, username, password, fullname, email, contact, address, avatar)
+VALUES
+
+--Gawin ninyung password hash ung pass
+(1, 'admin', 'admin123', 'System Administrator', 'admin@example.com', '09123456789', 'Barangay Iba', NULL),
+(2, 'staff1', 'password1', 'Inventory Staff One', 'staff1@example.com', '09998887777', 'Barangay Iba', NULL);
+
+-- 3. Equipment
+INSERT INTO equipment (code, name, description, category, total_quantity, available_quantity, `condition`, location, created_by)
+VALUES
+('EQ-001', 'Portable Speaker', 'High-power outdoor speaker', 'Audio', 5, 5, 'Good', 'Storage Room A', 1),
+('EQ-002', 'Plastic Chair', 'Monoblock chair', 'Furniture', 50, 50, 'Good', 'Storage Room B', 1),
+('EQ-003', 'Tent 10x10', 'Event tent', 'Shelter', 3, 3, 'Good', 'Storage Room C', 2);
+
+-- 4. Equipment Photos
+INSERT INTO equipment_photos (equipment_id, filename, caption)
+VALUES
+(1, 'speaker1.jpg', 'Front view'),
+(2, 'chair1.jpg', 'Stacked chairs'),
+(3, 'tent1.jpg', 'Sample setup');
+
+-- 5. Maintenance Logs
+INSERT INTO maintenance_logs (equipment_id, action, remarks, performed_by)
+VALUES
+(1, 'Checked', 'All parts working', 2),
+(2, 'Serviced', 'Cleaned and sanitized', 1);
+
+-- 6. Requests
+INSERT INTO requests (request_no, created_by, borrower_name, borrower_address, borrower_contact, date_needed, expected_return_date, status, remarks)
+VALUES
+('REQ-0001', 1, 'Juan Dela Cruz', 'Barangay Iba', '09192223333', '2025-02-10', '2025-02-12', 'Pending', 'For barangay meeting'),
+('REQ-0002', 2, 'Maria Santos', 'Barangay Iba', '09221114444', '2025-02-15', '2025-02-16', 'Approved', 'For event use');
+
+-- 7. Request Items
+INSERT INTO request_items (request_id, equipment_id, quantity, unit_condition)
+VALUES
+(1, 2, 10, 'Good'),
+(2, 1, 1, 'Good');
+
+-- 8. Borrowings
+INSERT INTO borrowings (borrowing_no, request_id, borrower_name, borrower_contact, borrower_address, issued_by, approved_by, expected_return_date)
+VALUES
+('BRW-0001', 2, 'Maria Santos', '09221114444', 'Barangay Iba', 2, 1, '2025-02-16');
+
+-- 9. Borrowing Items
+INSERT INTO borrowing_items (borrowing_id, equipment_id, quantity, condition_out)
+VALUES
+(1, 1, 1, 'Good');
+
+-- 10. Return Photos
+INSERT INTO return_photos (borrowing_item_id, filename)
+VALUES
+(1, 'speaker_return.jpg');
+
+-- 11. Reports
+INSERT INTO reports (name, type, params, generated_by, path)
+VALUES
+('Monthly Borrowing Report', 'PDF', '{"month":"February"}', 1, 'reports/monthly_feb.pdf');
+
+-- 12. Audit Logs
+INSERT INTO audit_logs (user_id, action, resource_type, resource_id, details, ip_address)
+VALUES
+(1, 'Create Request', 'Request', '1', 'Request REQ-0001 created', '127.0.0.1'),
+(2, 'Approve Request', 'Request', '2', 'Request REQ-0002 approved', '127.0.0.1');
+
+-- 13. Settings
+INSERT INTO settings (key_name, key_value)
+VALUES
+('site_name', 'Barangay Inventory System'),
+('borrow_limit', '150');
+
+-- 14. Backups
+INSERT INTO backups (filename, size_bytes)
+VALUES
+('backup_2025_02_01.sql', 204800);
