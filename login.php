@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function(){
             if (data.success) {
                 const role = data.user.role.toLowerCase();
                 if (role === 'admin') window.location.href = './admin/dashboard.php';
-                else if (role === 'official') window.location.href = './officials/dashboard.php';
+                else if (role === 'staff') window.location.href = './officials/dashboard.php';
                 else {
                     msg.textContent = 'Role not recognized';
                     adjustContainer();
