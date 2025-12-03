@@ -15,7 +15,7 @@ $stmt = $conn->prepare("SELECT r.*, u.fullname AS creator_name
                         FROM requests r 
                         JOIN users u ON r.created_by = u.id 
                         WHERE r.status = :status 
-                        ORDER BY r.created_at ASC");
+                        ORDER BY r.created_at DESC");
 $stmt->bindParam(':status', $status);
 $stmt->execute();
 $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
