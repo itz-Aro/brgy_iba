@@ -48,7 +48,7 @@ if (isset($_SESSION['user'])) {
 
 <div class="login-box">
 <?php if ($alreadyLoggedIn): ?>
-    <p>You are already logged in as <strong><?php echo ucfirst($role); ?></strong>.</p>
+    <p>You are already logged in as haxhaxijasnxjiashdwy8huanzja <strong><?php echo ucfirst($role); ?></strong>.</p>
     <a href="./logout.php" class="btn btn-danger logout-btn">Logout</a>
 <?php else: ?>
     <form id="loginForm">

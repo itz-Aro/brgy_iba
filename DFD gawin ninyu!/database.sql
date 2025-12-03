@@ -239,7 +239,7 @@ INSERT INTO roles (name, description) VALUES
 INSERT INTO users (role_id, username, password, fullname, email, contact, address, avatar)
 VALUES
 
---Gawin ninyung password hash ung pass
+
 (1, 'admin', 'admin123', 'System Administrator', 'admin@example.com', '09123456789', 'Barangay Iba', NULL),
 (2, 'staff1', 'password1', 'Inventory Staff One', 'staff1@example.com', '09998887777', 'Barangay Iba', NULL);
 
