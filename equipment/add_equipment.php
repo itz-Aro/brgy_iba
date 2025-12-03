@@ -147,6 +147,7 @@ $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$avail
       </div>
 
       <button type="submit" class="submit-btn">Add Equipment</button>
+      <a href="equipment.php" class="cancel-btn">Cancel</a>
     </form>
   </div>
 </main>

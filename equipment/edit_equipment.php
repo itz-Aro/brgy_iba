@@ -74,7 +74,6 @@ $res = $stmt->execute([
 
 
     if ($res) {
-    // Redirect to list page after successful update
     header("Location: equipment.php");
     exit();
 } else {
@@ -180,6 +179,7 @@ $res = $stmt->execute([
             </div>
 
             <button class="submit-btn">Update Equipment</button>
+             <a href="equipment.php" class="cancel-btn">Cancel</a>
         </form>
     </div>
 </main>
