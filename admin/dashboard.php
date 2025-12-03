@@ -12,7 +12,7 @@ $conn = $db->getConnection();
 $pendingRequests = (int)$conn->query("SELECT COUNT(*) FROM requests WHERE status = 'Pending'")->fetchColumn();
 $ongoingBorrowings = (int)$conn->query("SELECT COUNT(*) FROM borrowings WHERE status = 'Active'")->fetchColumn();
 $itemsDue = (int)$conn->query("SELECT COUNT(*) FROM borrowings WHERE status = 'Active' AND expected_return_date <= NOW()")->fetchColumn();
-// $damageReports = (int)$conn->query("SELECT COUNT(*) FROM damage_reports")->fetchColumn();
+$damagedEquipment = $conn->query("SELECT COUNT(*) FROM equipment WHERE `condition`='Damaged'")->fetchColumn();
 
 // Recent requests
 $stmt = $conn->prepare("SELECT id, request_no, borrower_name, status, expected_return_date, created_at FROM requests ORDER BY created_at DESC LIMIT 7");
@@ -189,7 +189,7 @@ $displayRole = htmlspecialchars($role);
       <button class="view-btn">View Details ▸</button>
     </div>
     <div class="stat-card card-damage">
-      <div class="stat-left"><h4>Total Damage Reports</h4><div class="stat-number">4</div></div> 
+      <div class="stat-left"><h4>Total Damage Reports</h4><div class="stat-number"><?=$damagedEquipment?></div></div> 
       <!-- <?= $damageReports ?> -->
       <div class="stat-icon">⚠️</div>
       <button class="view-btn">View Details ▸</button>

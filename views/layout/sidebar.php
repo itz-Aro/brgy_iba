@@ -111,6 +111,11 @@ body {
         <a href="\brgy_iba\approval\requests_pending.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
+
+        <a href="\brgy_iba\approval\requests_pending.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
+            <i class="fas fa-arrow-turn-up"></i> Returned Items
+        </a>
+
         <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
             <i class="fas fa-chart-line"></i> Reports
         </a>
