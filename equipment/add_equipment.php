@@ -128,11 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="number" name="total_quantity" id="total_quantity" required min="0" value="0">
       </div>
 
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="available_quantity">Available Quantity</label>
         <input type="number" name="available_quantity" id="available_quantity" min="0" value="0">
         <small>Leave blank to match total quantity</small>
-      </div>
+      </div> -->
 
       <div class="form-group">
         <label for="condition">Condition</label>

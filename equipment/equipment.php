@@ -81,7 +81,7 @@ $displayRole = htmlspecialchars($role);
         <th>Name</th>
         <th>Category</th>
         <th>Total Qty</th>
-        <th>Available Qty</th>
+        <!-- <th>Available Qty</th> -->
         <th>Condition</th>
         <th>Location</th>
         <th>Actions</th>

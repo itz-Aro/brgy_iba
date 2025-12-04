@@ -155,10 +155,10 @@ $res = $stmt->execute([
                 <input type="number" name="total_quantity" min="0" required value="<?= $equipment['total_quantity'] ?>">
             </div>
 
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label>Available Quantity *</label>
                 <input type="number" name="available_quantity" min="0" required value="<?= $equipment['available_quantity'] ?>">
-            </div>
+            </div> -->
 
             <div class="form-group">
                 <label>Condition</label>
