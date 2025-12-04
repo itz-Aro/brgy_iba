@@ -75,8 +75,9 @@ $res = $stmt->execute([
 
 
  if ($res) {
-    header("Location: equipment.php?updated=1");
+    
         $success = "Equipment updated successfully!";
+        header("Location: equipment.php?updated=1");
         // refresh data
         $stmt = $conn->prepare("SELECT * FROM equipment WHERE id = ?");
         $stmt->execute([$id]);

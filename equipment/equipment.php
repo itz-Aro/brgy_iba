@@ -19,7 +19,6 @@ $displayRole = htmlspecialchars($role);
 
 <link rel="stylesheet" href="/public/css/dashboard.css">
 <style>
-/* Match dashboard UI */
 :root{
   --blue:#0d47a1;
   --light-gray:#efefef;
@@ -27,13 +26,12 @@ $displayRole = htmlspecialchars($role);
   --radius:14px;
 }
 .content-wrap{ margin-left:250px; padding:22px; max-width:1500px; margin-top:0px;}
-.top-header{ margin-bottom:10px;background:var(--blue); color:white; border-radius:12px; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 14px rgba(0,0,0,0.12);}
+.top-header{ margin-bottom:10px;background:var(--blue); color:white; border-radius:12px; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 14px rgba(0,0,0,0.12); }
 .top-header .title{ font-size:44px; font-weight:800; letter-spacing:-0.5px; }
 .admin-area{ display:flex; align-items:center; gap:18px; }
 .greeting{ font-size:18px; opacity:0.95; }
 .avatar{ width:56px; height:56px; border-radius:50%; background:white; color:var(--blue); display:flex; justify-content:center; align-items:center; font-weight:700; font-size:18px; border:4px solid #cfe1ff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
 
-/* Equipment Table */
 .equipment-table{ width:100%; border-collapse:collapse; margin-top:18px; background:white; box-shadow:var(--card-shadow); border-radius:12px; overflow:hidden;}
 .equipment-table th, .equipment-table td{ padding:12px 16px; text-align:left; font-size:14px; border-bottom:1px solid #f1f3f6;}
 .equipment-table th{ background:#f5f7fb; font-weight:700; color:#0d47a1;}
@@ -43,11 +41,9 @@ $displayRole = htmlspecialchars($role);
 .status-fair{ background:#fff9c4; color:#f9a825; }
 .status-damaged{ background:#ffcdd2; color:#b71c1c; }
 
-/* Action buttons */
 .action-btn{ background:var(--blue); color:white; border:none; padding:6px 12px; border-radius:10px; font-weight:600; cursor:pointer; margin-right:6px; transition:0.2s; }
 .action-btn:hover{ opacity:0.9; transform:scale(1.05); }
 
-/* Add Equipment Button */
 .add-equipment{ display:inline-block; margin-bottom:12px; background:#1e73ff; color:white; padding:10px 16px; border-radius:12px; font-weight:700; text-decoration:none; }
 </style>
 
@@ -59,6 +55,21 @@ $displayRole = htmlspecialchars($role);
       <div class="avatar">AD</div>
     </div>
   </div>
+
+  <!-- SUCCESS MESSAGE (Auto-hide after 2 seconds) -->
+  <?php if(isset($_GET['updated']) && $_GET['updated'] == 1): ?>
+      <div id="successMsg" style="
+          background:#c8e6c9; 
+          color:#2e7d32; 
+          padding:12px; 
+          border-radius:10px; 
+          margin-bottom:15px; 
+          font-weight:600;
+          transition: opacity 0.5s ease;
+      ">
+          ✅ Equipment updated successfully!
+      </div>
+  <?php endif; ?>
 
   <a href="add_equipment.php" class="add-equipment">+ Add Equipment</a>
 
@@ -87,7 +98,9 @@ $displayRole = htmlspecialchars($role);
           <td><?= htmlspecialchars($eq['total_quantity']) ?></td>
           <td><?= htmlspecialchars($eq['available_quantity']) ?></td>
           <td>
-            <span class="status <?= strtolower($eq['condition']) === 'good' ? 'status-good' : (strtolower($eq['condition'])==='fair'?'status-fair':'status-damaged') ?>">
+            <span class="status 
+                <?= strtolower($eq['condition']) === 'good' ? 'status-good' : 
+                   (strtolower($eq['condition'])==='fair' ? 'status-fair':'status-damaged') ?>">
               <?= htmlspecialchars($eq['condition']) ?>
             </span>
           </td>
@@ -104,3 +117,14 @@ $displayRole = htmlspecialchars($role);
     </tbody>
   </table>
 </main>
+
+<!-- AUTO-HIDE SCRIPT -->
+<script>
+    setTimeout(() => {
+        const msg = document.getElementById("successMsg");
+        if (msg) {
+            msg.style.opacity = "0"; // fade out
+            setTimeout(() => msg.remove(), 500); // remove after fade
+        }
+    }, 2000); // disappears after 2 seconds
+</script>
