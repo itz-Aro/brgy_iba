@@ -73,12 +73,17 @@ $res = $stmt->execute([
 ]);
 
 
-    if ($res) {
-    header("Location: equipment.php");
-    exit();
-} else {
-    $error = "Failed to update equipment.";
-}
+
+ if ($res) {
+    header("Location: equipment.php?updated=1");
+        $success = "Equipment updated successfully!";
+        // refresh data
+        $stmt = $conn->prepare("SELECT * FROM equipment WHERE id = ?");
+        $stmt->execute([$id]);
+        $equipment = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        $error = "Failed to update equipment.";
+    }
 
 }
 
