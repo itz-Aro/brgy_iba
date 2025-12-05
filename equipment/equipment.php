@@ -56,7 +56,7 @@ $displayRole = htmlspecialchars($role);
     </div>
   </div>
 
-  <!-- SUCCESS MESSAGE (Auto-hide after 2 seconds) -->
+  <!-- SUCCESS MESSAGE -->
   <?php if(isset($_GET['updated']) && $_GET['updated'] == 1): ?>
       <div id="successMsg" style="
           background:#c8e6c9; 
@@ -81,12 +81,13 @@ $displayRole = htmlspecialchars($role);
         <th>Name</th>
         <th>Category</th>
         <th>Total Qty</th>
-        <!-- <th>Available Qty</th> -->
+        <th>Available Qty</th>
         <th>Condition</th>
         <th>Location</th>
         <th>Actions</th>
       </tr>
     </thead>
+
     <tbody>
       <?php if(!empty($equipments)): ?>
         <?php foreach($equipments as $eq): ?>
@@ -95,8 +96,12 @@ $displayRole = htmlspecialchars($role);
           <td><?= htmlspecialchars($eq['code']) ?></td>
           <td><?= htmlspecialchars($eq['name']) ?></td>
           <td><?= htmlspecialchars($eq['category']) ?></td>
+
+          <!-- CORRECTED QUANTITIES -->
           <td><?= htmlspecialchars($eq['total_quantity']) ?></td>
           <td><?= htmlspecialchars($eq['available_quantity']) ?></td>
+
+          <!-- FIXED CONDITION DISPLAY -->
           <td>
             <span class="status 
                 <?= strtolower($eq['condition']) === 'good' ? 'status-good' : 
@@ -104,7 +109,9 @@ $displayRole = htmlspecialchars($role);
               <?= htmlspecialchars($eq['condition']) ?>
             </span>
           </td>
+
           <td><?= htmlspecialchars($eq['location']) ?></td>
+
           <td>
             <a href="edit_equipment.php?id=<?= $eq['id'] ?>" class="action-btn">Edit</a>
             <a href="delete_equipment.php?id=<?= $eq['id'] ?>" class="action-btn" onclick="return confirm('Delete this equipment?')">Delete</a>
@@ -123,8 +130,8 @@ $displayRole = htmlspecialchars($role);
     setTimeout(() => {
         const msg = document.getElementById("successMsg");
         if (msg) {
-            msg.style.opacity = "0"; // fade out
-            setTimeout(() => msg.remove(), 500); // remove after fade
+            msg.style.opacity = "0";
+            setTimeout(() => msg.remove(), 500);
         }
-    }, 2000); // disappears after 2 seconds
+    }, 2000);
 </script>
