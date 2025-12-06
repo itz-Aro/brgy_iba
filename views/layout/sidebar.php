@@ -1,4 +1,8 @@
+
 <?php
+require_once __DIR__ . '/../../middleware/AuthMiddleware.php';
+AuthMiddleware::protect(['admin', 'official']); // make sure roles match your DB
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,11 +12,21 @@ $role = $_SESSION['user']['role'] ?? '';
 $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 ?>
 
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <!-- Sidebar CSS -->
 <style>
 /* Reset */
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
 
 /* SIDEBAR */
 .sidebar {
@@ -91,7 +105,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
 
-        <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'report.php' ? 'active' : '' ?>">
+        <a href="/brgy_iba/admin/admin_returns.php" class="<?= $currentPage == 'admin_returns.php' ? 'active' : '' ?>">
+            <i class="fas fa-arrow-turn-up"></i> Returned Items
+        </a>
+
+
+        <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
             <i class="fas fa-chart-line"></i> Reports
         </a>
 
