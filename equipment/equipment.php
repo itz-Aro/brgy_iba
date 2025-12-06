@@ -18,6 +18,7 @@ $displayRole = htmlspecialchars($role);
 ?>
 
 <link rel="stylesheet" href="/public/css/dashboard.css">
+
 <style>
 :root{
   --blue:#0d47a1;
@@ -35,7 +36,7 @@ $displayRole = htmlspecialchars($role);
 .equipment-table{ width:100%; border-collapse:collapse; margin-top:18px; background:white; box-shadow:var(--card-shadow); border-radius:12px; overflow:hidden;}
 .equipment-table th, .equipment-table td{ padding:12px 16px; text-align:left; font-size:14px; border-bottom:1px solid #f1f3f6;}
 .equipment-table th{ background:#f5f7fb; font-weight:700; color:#0d47a1;}
-.equipment-table td img{ width:48px; height:48px; border-radius:8px; object-fit:cover; }
+.equipment-table td img{ width:48px; height:48px; border-radius:8px; object-fit:cover; cursor:pointer; }
 .equipment-table td .status{ font-weight:600; padding:4px 10px; border-radius:8px; display:inline-block; font-size:13px; }
 .status-good{ background:#c8e6c9; color:#2e7d32; }
 .status-fair{ background:#fff9c4; color:#f9a825; }
@@ -45,6 +46,24 @@ $displayRole = htmlspecialchars($role);
 .action-btn:hover{ opacity:0.9; transform:scale(1.05); }
 
 .add-equipment{ display:inline-block; margin-bottom:12px; background:#1e73ff; color:white; padding:10px 16px; border-radius:12px; font-weight:700; text-decoration:none; }
+
+/* MODAL PHOTO VIEWER */
+#photoModal{
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+#photoModal img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:12px;
+  box-shadow:0 0 20px #000;
+}
 </style>
 
 <main class="content-wrap">
@@ -92,16 +111,20 @@ $displayRole = htmlspecialchars($role);
       <?php if(!empty($equipments)): ?>
         <?php foreach($equipments as $eq): ?>
         <tr>
-          <td><img src="equipment_img/<?= htmlspecialchars($eq['photo'] ?: 'default.png') ?>" alt="Photo"></td>
+          <td>
+            <img 
+              src="equipment_img/<?= htmlspecialchars($eq['photo'] ?: 'default.png') ?>" 
+              onclick="viewPhoto(this.src)"
+            >
+          </td>
+
           <td><?= htmlspecialchars($eq['code']) ?></td>
           <td><?= htmlspecialchars($eq['name']) ?></td>
           <td><?= htmlspecialchars($eq['category']) ?></td>
 
-          <!-- CORRECTED QUANTITIES -->
           <td><?= htmlspecialchars($eq['total_quantity']) ?></td>
           <td><?= htmlspecialchars($eq['available_quantity']) ?></td>
 
-          <!-- FIXED CONDITION DISPLAY -->
           <td>
             <span class="status 
                 <?= strtolower($eq['condition']) === 'good' ? 'status-good' : 
@@ -125,13 +148,23 @@ $displayRole = htmlspecialchars($role);
   </table>
 </main>
 
+<!-- MODAL FOR PHOTO VIEW -->
+<div id="photoModal" onclick="this.style.display='none'">
+    <img id="modalImg">
+</div>
+
 <!-- AUTO-HIDE SCRIPT -->
 <script>
-    setTimeout(() => {
-        const msg = document.getElementById("successMsg");
-        if (msg) {
-            msg.style.opacity = "0";
-            setTimeout(() => msg.remove(), 500);
-        }
-    }, 2000);
+function viewPhoto(src){
+    document.getElementById("modalImg").src = src;
+    document.getElementById("photoModal").style.display = "flex";
+}
+
+setTimeout(() => {
+    const msg = document.getElementById("successMsg");
+    if (msg) {
+        msg.style.opacity = "0";
+        setTimeout(() => msg.remove(), 500);
+    }
+}, 2000);
 </script>

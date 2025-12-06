@@ -10,6 +10,20 @@ $conn = $db->getConnection();
 $role = $_SESSION['user']['role'] ?? 'Admin';
 $displayRole = htmlspecialchars($role);
 
+// ⭐ AUTO GENERATE NEXT CODE
+$getCode = $conn->query("SELECT code FROM equipment ORDER BY id DESC LIMIT 1");
+$last = $getCode->fetch(PDO::FETCH_ASSOC);
+
+if ($last) {
+    // Remove non-numeric characters then increment
+    $num = (int) preg_replace('/[^0-9]/', '', $last['code']);
+    $nextNum = str_pad($num + 1, 3, '0', STR_PAD_LEFT);
+    $generatedCode = "EQ-" . $nextNum;
+} else {
+    // If no equipment yet
+    $generatedCode = "EQ-001";
+}
+
 // Handle form submission
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -38,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
     }
 
-    // Insert into database
+    // Insert to database
     $stmt = $conn->prepare("INSERT INTO equipment 
         (code,name,description,category,total_quantity,available_quantity,`condition`,location,photo,created_by) 
         VALUES (?,?,?,?,?,?,?,?,?,?)");
@@ -46,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$available_quantity,$condition,$location,$photo,$created_by]);
 
     if ($res) {
-        // Redirect to equipment.php with success message
         header("Location: equipment.php?updated=1");
         exit();
     } else {
@@ -93,9 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form action="" method="POST" enctype="multipart/form-data">
+
+      <!-- ⭐ AUTO GENERATED CODE FIELD -->
       <div class="form-group">
-        <label for="code">Equipment Code *</label>
-        <input type="text" name="code" id="code" required placeholder="E.g. CH-001">
+        <!-- <label for="code">Equipment Code *</label> -->
+        <input type="text" name="code" id="code" value="<?= $generatedCode ?>" readonly>
       </div>
 
       <div class="form-group">
@@ -128,12 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="number" name="total_quantity" id="total_quantity" required min="0" value="0">
       </div>
 
-      <!-- <div class="form-group">
-        <label for="available_quantity">Available Quantity</label>
-        <input type="number" name="available_quantity" id="available_quantity" min="0" value="0">
-        <small>Leave blank to match total quantity</small>
-      </div> -->
-
       <div class="form-group">
         <label for="condition">Condition</label>
         <select name="condition" id="condition">
@@ -157,6 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <button type="submit" class="submit-btn">Add Equipment</button>
       <a href="equipment.php" class="cancel-btn">Cancel</a>
+
     </form>
   </div>
 </main>
