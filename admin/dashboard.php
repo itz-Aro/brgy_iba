@@ -21,14 +21,12 @@ $stmt->execute();
 $activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Recent audit logs (for feed)
-$logStmt = $conn->prepare("SELECT id, user_id, action, resource_type, resource_id, details, ip_address, created_at FROM audit_logs ORDER BY created_at DESC LIMIT 7");
-$logStmt->execute();
-$auditLogs = $logStmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Merge and sort activity feed (requests + audit logs)
 $activityFeed = [];
 foreach ($activities as $r) $activityFeed[] = ['type'=>'request','created_at'=>$r['created_at'],'data'=>$r];
-foreach ($auditLogs as $l) $activityFeed[] = ['type'=>'audit','created_at'=>$l['created_at'],'data'=>$l];
+
 usort($activityFeed, function($a,$b){ return strtotime($b['created_at']) - strtotime($a['created_at']); });
 
 // Fetch top 7 most borrowed equipment (sum quantities)
