@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Get user role and current page
 $role = $_SESSION['user']['role'] ?? '';
 $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 ?>
@@ -10,15 +11,8 @@ $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 <!-- Sidebar CSS -->
 <style>
 /* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
 /* SIDEBAR */
 .sidebar {
@@ -68,30 +62,15 @@ body {
     transition: 0.3s;
 }
 
-.sidebar a i {
-    margin-right: 12px;
-    font-size: 18px;
-}
+.sidebar a i { margin-right: 12px; font-size: 18px; }
 
-.sidebar a:hover {
-    background-color: rgba(255,255,255,0.25);
-    transform: translateX(5px);
-}
+.sidebar a:hover { background-color: rgba(255,255,255,0.25); transform: translateX(5px); }
 
-.sidebar a.active {
-    background-color: rgba(255,255,255,0.35);
-}
+.sidebar a.active { background-color: rgba(255,255,255,0.35); }
 
 /* Responsive */
 @media (max-width: 900px) {
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        padding: 15px;
-        justify-content: space-around;
-    }
+    .sidebar { position: relative; width: 100%; height: auto; flex-direction: row; padding: 15px; justify-content: space-around; }
 }
 </style>
 
@@ -108,11 +87,16 @@ body {
             <i class="fas fa-home"></i> Dashboard
         </a>
 
-        <a href="\brgy_iba\approval\requests_pending.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
+        <a href="\brgy_iba\approval\requests_pending.php" class="<?= $currentPage == 'requests_pending.php' ? 'active' : '' ?>">
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
-        <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
+
+        <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'report.php' ? 'active' : '' ?>">
             <i class="fas fa-chart-line"></i> Reports
+        </a>
+
+        <a href="/brgy_iba/maintenance/maintenance.php" class="<?= $currentPage == 'maintenance.php' ? 'active' : '' ?>">
+            <i class="fas fa-tools"></i> Maintenance
         </a>
 
     <?php elseif ($role === 'staff'): ?>
@@ -123,11 +107,15 @@ body {
         <a href="/brgy_iba/equipment/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
             <i class="fas fa-box"></i> Manage Stocks
         </a>
+
+        <a href="/brgy_iba/equipment/maintenance.php" class="<?= $currentPage == 'maintenance.php' ? 'active' : '' ?>">
+            <i class="fas fa-tools"></i> Maintenance
+        </a>
     <?php endif; ?>
     
     <a href="/brgy_iba/profile.php" class="<?= $currentPage == 'profile.php' ? 'active' : '' ?>">
-            <i class="fas fa-user"></i> Profile
-        </a>
+        <i class="fas fa-user"></i> Profile
+    </a>
 
     <a href="/brgy_iba/logout.php">
         <i class="fas fa-sign-out-alt"></i> Logout
