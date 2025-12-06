@@ -12,6 +12,8 @@ $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 ?>
 
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <!-- Sidebar CSS -->
 <style>
 /* Reset */
@@ -22,7 +24,7 @@ $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* SIDEBAR */

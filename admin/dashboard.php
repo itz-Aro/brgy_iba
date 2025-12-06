@@ -70,7 +70,7 @@ $displayRole = htmlspecialchars($role, ENT_QUOTES);
 <style>
 /* ===== copied visual language from admin_returns.php ===== */
 * { box-sizing: border-box; }
-body { font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; }
+body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
 
 .content-wrap { 
     margin-left: 250px; 

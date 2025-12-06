@@ -34,7 +34,7 @@ $displayRole = htmlspecialchars($role);
    Copy style from admin_returns.php
 ====================== */
 * { box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background:#f1f5f9; margin:0; }
+body { font-family: 'Poppins', sans-serif; background:#f1f5f9; margin:0; }
 
 .content-wrap { 
     margin-left: 250px; 

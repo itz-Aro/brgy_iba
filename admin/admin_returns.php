@@ -206,7 +206,7 @@ $displayRole = htmlspecialchars($role);
 * { box-sizing: border-box; }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: #f1f5f9;
     margin: 0;
 }
