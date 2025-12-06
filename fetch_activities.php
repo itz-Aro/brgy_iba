@@ -1,87 +1,100 @@
 <?php
-require_once __DIR__ . '../config/Database.php';
+// /brgy_iba/fetch_activities.php
 session_start();
+require_once __DIR__ . '/config/Database.php';
 
-$db = new Database();
-$conn = $db->getConnection();
+header('Content-Type: application/json; charset=utf-8');
 
-$perPage = 7;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$start = ($page - 1) * $perPage;
+try {
+    $db = new Database();
+    $conn = $db->getConnection();
 
-// Get total counts
-$totalRequests = (int)$conn->query("SELECT COUNT(*) FROM requests")->fetchColumn();
-$totalAudits = (int)$conn->query("SELECT COUNT(*) FROM audit_logs")->fetchColumn();
-$totalActivities = $totalRequests + $totalAudits;
-$totalPages = ceil($totalActivities / $perPage);
+    $page  = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $limit = isset($_GET['limit']) ? max(1, (int)$_GET['limit']) : 7; // default 7 items per page
+    $offset = ($page - 1) * $limit;
 
-// Fetch recent requests
-$stmt = $conn->prepare("
-    SELECT id, request_no, borrower_name, status, expected_return_date, created_at
-    FROM requests
-    ORDER BY created_at DESC
-    LIMIT $start, $perPage
-");
-$stmt->execute();
-$activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Count total rows (requests + audit_logs) safely
+    $totalStmt = $conn->query("SELECT (SELECT COUNT(*) FROM requests) + (SELECT COUNT(*) FROM audit_logs) AS total");
+    $total = (int)$totalStmt->fetchColumn();
+    $totalPages = ($total > 0) ? (int)ceil($total / $limit) : 1;
 
-// Fetch recent audit logs
-$logStmt = $conn->prepare("
-    SELECT id, user_id, action, resource_type, resource_id, details, ip_address, created_at
-    FROM audit_logs
-    ORDER BY created_at DESC
-    LIMIT $start, $perPage
-");
-$logStmt->execute();
-$auditLogs = $logStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Union query: normalize columns for rendering
+    $sql = "
+        SELECT id, request_no AS ref_no, borrower_name AS title, status AS extra_status, expected_return_date, created_at, 'request' AS type
+        FROM requests
+        UNION ALL
+        SELECT id, NULL AS ref_no, CONCAT('User #', user_id) AS title, action AS extra_status, NULL AS expected_return_date, created_at, 'audit' AS type
+        FROM audit_logs
+        ORDER BY created_at DESC
+        LIMIT :limit OFFSET :offset
+    ";
 
-// Merge and sort
-$activityFeed = [];
-foreach ($activities as $r) { $activityFeed[] = ['type'=>'request','created_at'=>$r['created_at'],'data'=>$r]; }
-foreach ($auditLogs as $l) { $activityFeed[] = ['type'=>'audit','created_at'=>$l['created_at'],'data'=>$l]; }
-usort($activityFeed, fn($a,$b)=> strtotime($b['created_at']) - strtotime($a['created_at']));
+    $stmt = $conn->prepare($sql);
+    // bind as integers
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Generate HTML
-ob_start();
-if(!empty($activityFeed)):
-    foreach($activityFeed as $item):
-        $dateDisplay = date("h:i / m-d-y", strtotime($item['created_at']));
-?>
-<li class="activity-item">
-    <div class="activity-avatar"><?= ($item['type']==='request') ? 'R':'A' ?></div>
-    <div class="activity-icon"><?= $item['type']==='request' ? ($item['data']['status']==='Approved'?'✅':($item['data']['status']==='Pending'?'❓':($item['data']['status']==='Declined'?'❌':'⏸'))) : '📝' ?></div>
-    <div class="activity-text">
-        <?php if($item['type']==='request'):
-            $r = $item['data'];
-            $msg = $r['status']==='Approved' ? 'Approved request #'.$r['request_no'] :
-                   ($r['status']==='Pending' ? 'Sent borrow request #'.$r['request_no'] :
-                   ($r['status']==='Declined' ? 'Request #'.$r['request_no'].' was declined' : $r['status'].' request #'.$r['request_no']));
-            $label = $r['status']==='Approved'?'label-success':($r['status']==='Declined'?'label-danger':'label-pending');
-        ?>
-        <div class="<?= $label ?>"><?= htmlspecialchars($r['borrower_name']) ?> · <?= $msg ?></div>
-        <div style="font-size:13px;color:#657085;margin-top:3px;">
-            <?= $r['expected_return_date'] ? 'Return: '.htmlspecialchars($r['expected_return_date']) : '' ?>
-        </div>
-        <?php else:
-            $a = $item['data'];
-        ?>
-        <div class="label-info">
-            User #<?= htmlspecialchars($a['user_id']) ?> · <?= htmlspecialchars($a['action']) ?> on <?= htmlspecialchars($a['resource_type']) ?> #<?= htmlspecialchars($a['resource_id']) ?>
-        </div>
-        <div style="font-size:13px;color:#657085;margin-top:3px;">
-            <?= htmlspecialchars($a['details'] ?: '') ?>
-        </div>
-        <?php endif; ?>
-    </div>
-    <div class="activity-meta"><?= $dateDisplay ?></div>
-</li>
-<?php
-    endforeach;
-else:
-    echo '<li style="padding:18px;">No recent activity.</li>';
-endif;
+    // Build HTML for the activity list items
+    ob_start();
+    if (empty($rows)) {
+        echo '<li style="padding:18px;color:#64748b;">No recent activity.</li>';
+    } else {
+        foreach ($rows as $row) {
+            $createdAt = !empty($row['created_at']) ? date("h:i / m-d-y", strtotime($row['created_at'])) : '';
+            if ($row['type'] === 'request') {
+                $rId = (int)$row['id'];
+                $refNo = htmlspecialchars($row['ref_no'] ?? '', ENT_QUOTES);
+                $borrower = htmlspecialchars($row['title'] ?? 'Unknown', ENT_QUOTES);
+                $status = htmlspecialchars($row['extra_status'] ?? '', ENT_QUOTES);
+                $expected = htmlspecialchars($row['expected_return_date'] ?? '', ENT_QUOTES);
+                // choose label class
+                $labelClass = $status === 'Approved' ? 'label-success' : ($status === 'Declined' ? 'label-danger' : 'label-pending');
 
-$html = ob_get_clean();
+                // Message text
+                $msg = $status === 'Approved' ? "Approved request #{$refNo}" : ($status === 'Pending' ? "Sent borrow request #{$refNo}" : "Request #{$refNo} was {$status}");
+                ?>
+                <li class="activity-item clickable" data-id="<?= $rId ?>" data-type="request" style="user-select:none;">
+                  <div class="activity-avatar">R</div>
+                  <div class="activity-text">
+                    <div class="<?= $labelClass ?>"><?= $borrower ?> · <?= htmlspecialchars($msg, ENT_QUOTES) ?></div>
+                    <div style="font-size:13px;color:#657085;margin-top:3px;"><?= $expected ? 'Return: ' . $expected : '' ?></div>
+                  </div>
+                  <div class="activity-meta"><?= $createdAt ?></div>
+                </li>
+                <?php
+            } else {
+                // audit
+                $aId = (int)$row['id'];
+                $title = htmlspecialchars($row['title'] ?? 'Audit', ENT_QUOTES);
+                $action = htmlspecialchars($row['extra_status'] ?? '', ENT_QUOTES);
+                ?>
+                <li class="activity-item" style="user-select:none;">
+                  <div class="activity-avatar">A</div>
+                  <div class="activity-text">
+                    <div style="font-weight:700;"><?= $title ?> · <?= $action ?></div>
+                    <div style="font-size:13px;color:#657085;margin-top:3px;"><?= '' ?></div>
+                  </div>
+                  <div class="activity-meta"><?= $createdAt ?></div>
+                </li>
+                <?php
+            }
+        }
+    }
+    $html = ob_get_clean();
 
-// Return JSON
-echo json_encode(['html'=>$html, 'totalPages'=>$totalPages]);
+    echo json_encode([
+        'success' => true,
+        'html' => $html,
+        'total' => $total,
+        'totalPages' => max(1, $totalPages),
+        'page' => $page,
+        'limit' => $limit
+    ]);
+    exit;
+} catch (Exception $ex) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Server error: ' . $ex->getMessage()]);
+    exit;
+}

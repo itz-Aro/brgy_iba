@@ -233,7 +233,6 @@ SET FOREIGN_KEY_CHECKS=1;
 INSERT INTO roles (name, description) VALUES
 ('Admin', 'System administrator'),
 ('Staff', 'Regular staff'),
-('Borrower', 'Barangay resident borrower');
 
 -- 2. Users
 INSERT INTO users (role_id, username, password, fullname, email, contact, address, avatar)

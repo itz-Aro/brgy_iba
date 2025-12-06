@@ -17,10 +17,11 @@ if (!$username || !$password) {
 
 try {
     $query = "SELECT u.id, u.username, u.password, u.fullname, r.name AS role
-              FROM users u
-              JOIN roles r ON u.role_id = r.id
-              WHERE u.username = :username
-              LIMIT 1";
+          FROM users u
+          JOIN roles r ON u.role_id = r.id
+          WHERE BINARY u.username = :username
+          LIMIT 1";
+
 
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':username', $username);

@@ -1,4 +1,8 @@
+
 <?php
+require_once __DIR__ . '/../../middleware/AuthMiddleware.php';
+AuthMiddleware::protect(['admin', 'official']); // make sure roles match your DB
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -6,6 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 $role = $_SESSION['user']['role'] ?? '';
 $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 ?>
+
 
 <!-- Sidebar CSS -->
 <style>
@@ -112,9 +117,10 @@ body {
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
 
-        <a href="\brgy_iba\approval\requests_pending.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
+        <a href="/brgy_iba/admin/admin_returns.php" class="<?= $currentPage == 'admin_returns.php' ? 'active' : '' ?>">
             <i class="fas fa-arrow-turn-up"></i> Returned Items
         </a>
+
 
         <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
             <i class="fas fa-chart-line"></i> Reports
