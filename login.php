@@ -25,8 +25,8 @@ if (isset($_SESSION['user'])) {
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #b9c4f8ff 0%, #725bf9ff 100%);
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #b9c4f8ff 0%, #083d92 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -56,9 +56,8 @@ body {
 }
 
 .login-container {
-   
     width: 380px;
-    height: 420px;
+    height: 460px;
     padding: 28px;
     display: flex;
     flex-direction: column;
@@ -78,10 +77,10 @@ body {
 
 .login-text h1 {
     text-align: center;
-    font-size: 22px;
+    font-size: 25px;
     font-weight: 700;
     margin-bottom: 6px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0f62e8ff 0%, #083d92 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -102,15 +101,16 @@ body {
 }
 
 .login-input {
-    margin:-10px;
+    /* margin:-10px; */
 }
 
 .input-field {
-    
     margin-bottom: 14px;
+    width: 100%;
 }
 
 .input-field input {
+    
     width: 100%;
     padding: 12px 14px;
     border-radius: 10px;
