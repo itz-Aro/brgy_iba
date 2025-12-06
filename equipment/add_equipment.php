@@ -10,8 +10,21 @@ $conn = $db->getConnection();
 $role = $_SESSION['user']['role'] ?? 'Admin';
 $displayRole = htmlspecialchars($role);
 
+// ⭐ AUTO GENERATE NEXT CODE
+$getCode = $conn->query("SELECT code FROM equipment ORDER BY id DESC LIMIT 1");
+$last = $getCode->fetch(PDO::FETCH_ASSOC);
+
+if ($last) {
+    // Remove non-numeric characters then increment
+    $num = (int) preg_replace('/[^0-9]/', '', $last['code']);
+    $nextNum = str_pad($num + 1, 3, '0', STR_PAD_LEFT);
+    $generatedCode = "EQ-" . $nextNum;
+} else {
+    // If no equipment yet
+    $generatedCode = "EQ-001";
+}
+
 // Handle form submission
-$success = '';
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code = $_POST['code'] ?? '';
@@ -25,34 +38,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $created_by = $_SESSION['user']['id'] ?? null;
 
     // Handle photo upload
-   // Handle photo upload
-// Handle photo upload and save inside equipment_img folder
-$photo = '';
-if (!empty($_FILES['photo']['name'])) {
+    $photo = '';
+    if (!empty($_FILES['photo']['name'])) {
+        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+        $photo = uniqid() . '.' . $ext;
 
-    $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-    $photo = uniqid() . '.' . $ext; // file name only
+        $uploadPath = __DIR__ . '/equipment_img/' . $photo;
 
-    $uploadPath = __DIR__ . '/equipment_img/' . $photo; // full directory path
+        if (!is_dir(__DIR__ . '/equipment_img')) {
+            mkdir(__DIR__ . '/equipment_img', 0777, true);
+        }
 
-    // create folder if missing
-    if (!is_dir(__DIR__ . '/equipment_img')) {
-        mkdir(__DIR__ . '/equipment_img', 0777, true);
+        move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
     }
 
-    move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
-}
+    // Insert to database
+    $stmt = $conn->prepare("INSERT INTO equipment 
+        (code,name,description,category,total_quantity,available_quantity,`condition`,location,photo,created_by) 
+        VALUES (?,?,?,?,?,?,?,?,?,?)");
 
+    $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$available_quantity,$condition,$location,$photo,$created_by]);
 
-// FIXED SQL
-$stmt = $conn->prepare("INSERT INTO equipment 
-(code,name,description,category,total_quantity,available_quantity,`condition`,location,photo,created_by) 
-VALUES (?,?,?,?,?,?,?,?,?,?)");
-
-$res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$available_quantity,$condition,$location,$photo,$created_by]);
-
-    if($res) $success = "Equipment successfully added!";
-    else $error = "Failed to add equipment. Please try again.";
+    if ($res) {
+        header("Location: equipment.php?updated=1");
+        exit();
+    } else {
+        $error = "Failed to add equipment. Please try again.";
+    }
 }
 ?>
 
@@ -73,8 +85,8 @@ $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$avail
 .form-group input[type="file"]{ font-size:14px; }
 .submit-btn{ background:#1e73ff; color:white; border:none; padding:12px 18px; font-weight:700; border-radius:12px; cursor:pointer; transition:0.2s; }
 .submit-btn:hover{ opacity:0.9; transform:scale(1.02); }
-.alert-success{ background:#c8e6c9; color:#2e7d32; padding:12px; border-radius:10px; margin-bottom:12px; }
 .alert-error{ background:#ffcdd2; color:#b71c1c; padding:12px; border-radius:10px; margin-bottom:12px; }
+.cancel-btn{ display:inline-block; margin-left:10px; padding:10px 16px; background:#ccc; color:#333; border-radius:10px; text-decoration:none; font-weight:600; }
 </style>
 
 <main class="content-wrap">
@@ -89,21 +101,21 @@ $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$avail
   <div class="form-card">
     <h2>New Equipment Details</h2>
 
-    <?php if($success): ?>
-      <div class="alert-success"><?= $success ?></div>
-    <?php elseif($error): ?>
+    <?php if($error): ?>
       <div class="alert-error"><?= $error ?></div>
     <?php endif; ?>
 
     <form action="" method="POST" enctype="multipart/form-data">
+
+      <!-- ⭐ AUTO GENERATED CODE FIELD -->
       <div class="form-group">
-        <label for="code">Equipment Code *</label>
-        <input type="text" name="code" id="code" required placeholder="E.g. CH-001">
+        <!-- <label for="code">Equipment Code *</label> -->
+        <input type="text" name="code" id="code" value="<?= $generatedCode ?>" readonly>
       </div>
 
       <div class="form-group">
         <label for="name">Name *</label>
-        <input type="text" name="name" id="name" required placeholder="E.g. Chair">
+        <input type="text" name="name" id="name" required placeholder="E.g. Equipment">
       </div>
 
       <div class="form-group">
@@ -113,18 +125,22 @@ $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$avail
 
       <div class="form-group">
         <label for="category">Category</label>
-        <input type="text" name="category" id="category" placeholder="E.g. Furniture">
+        <select name="category" id="category" required>
+          <option value="" disabled selected>Select Category</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Sports Equipment">Sports Equipment</option>
+          <option value="Laboratory Equipment">Laboratory Equipment</option>
+          <option value="IT Equipment">IT Equipment</option>
+          <option value="Office Supplies">Office Supplies</option>
+          <option value="Tools">Tools</option>
+          <option value="Others">Others</option>
+        </select>
       </div>
 
       <div class="form-group">
         <label for="total_quantity">Total Quantity *</label>
         <input type="number" name="total_quantity" id="total_quantity" required min="0" value="0">
-      </div>
-
-      <div class="form-group">
-        <label for="available_quantity">Available Quantity</label>
-        <input type="number" name="available_quantity" id="available_quantity" min="0" value="0">
-        <small>Leave blank to match total quantity</small>
       </div>
 
       <div class="form-group">
@@ -138,7 +154,9 @@ $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$avail
 
       <div class="form-group">
         <label for="location">Location</label>
-        <input type="text" name="location" id="location" placeholder="E.g. Barangay Hall Storage">
+        <select name="location" id="location" required>
+          <option value="Barangay Iba, Taal, Batangas" selected>Barangay Iba, Taal, Batangas</option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -147,6 +165,8 @@ $res = $stmt->execute([$code,$name,$description,$category,$total_quantity,$avail
       </div>
 
       <button type="submit" class="submit-btn">Add Equipment</button>
+      <a href="equipment.php" class="cancel-btn">Cancel</a>
+
     </form>
   </div>
 </main>

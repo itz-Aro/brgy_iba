@@ -73,8 +73,11 @@ $res = $stmt->execute([
 ]);
 
 
-    if ($res) {
+
+ if ($res) {
+    
         $success = "Equipment updated successfully!";
+        header("Location: equipment.php?updated=1");
         // refresh data
         $stmt = $conn->prepare("SELECT * FROM equipment WHERE id = ?");
         $stmt->execute([$id]);
@@ -82,6 +85,7 @@ $res = $stmt->execute([
     } else {
         $error = "Failed to update equipment.";
     }
+
 }
 
 ?>
@@ -181,6 +185,7 @@ $res = $stmt->execute([
             </div>
 
             <button class="submit-btn">Update Equipment</button>
+             <a href="equipment.php" class="cancel-btn">Cancel</a>
         </form>
     </div>
 </main>
