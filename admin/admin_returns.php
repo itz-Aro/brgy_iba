@@ -175,14 +175,23 @@ FROM borrowing_items bi
 JOIN borrowings b ON bi.borrowing_id = b.id
 JOIN equipment e ON bi.equipment_id = e.id
 LEFT JOIN return_photos rp ON rp.borrowing_item_id = bi.id
-LEFT JOIN maintenance_logs ml 
-    ON ml.equipment_id = bi.equipment_id 
-    AND ml.action = 'Marked Damaged'
+LEFT JOIN (
+    SELECT m1.*
+    FROM maintenance_logs m1
+    INNER JOIN (
+        SELECT equipment_id, MAX(id) AS max_id
+        FROM maintenance_logs
+        WHERE action = 'Marked Damaged'
+        GROUP BY equipment_id
+    ) m2 ON m1.id = m2.max_id
+) ml ON ml.equipment_id = bi.equipment_id
 WHERE bi.condition_in = 'Damaged'
 ORDER BY b.actual_return_date DESC
 ");
+
 $stmtDamaged->execute();
 $damagedItems = $stmtDamaged->fetchAll(PDO::FETCH_ASSOC);
+
 
 
 $role = $_SESSION['user']['role'] ?? 'Admin';
@@ -870,8 +879,6 @@ body {
                                 <span style="color:#64748b; font-size:0.85rem;">No Remarks</span>
                             <?php endif; ?>
                         </td>
-
-
                         <td>
                             <?php if(!empty($r['return_photo']) && file_exists(__DIR__ . '/../uploads/returns/' . $r['return_photo'])): ?>
                                 <img 
