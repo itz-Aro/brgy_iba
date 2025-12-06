@@ -2,7 +2,8 @@
 session_start();
 require_once __DIR__ . '/../views/layout/sidebar.php';
 require_once __DIR__ . '/../config/Database.php';
-
+require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+AuthMiddleware::protect(['admin', 'official']);
 
 // DB connection
 $db = new Database();
