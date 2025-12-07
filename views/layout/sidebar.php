@@ -1,11 +1,19 @@
+
 <?php
+require_once __DIR__ . '/../../middleware/AuthMiddleware.php';
+AuthMiddleware::protect(['admin', 'official']); // make sure roles match your DB
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Get user role and current page
 $role = $_SESSION['user']['role'] ?? '';
 $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 ?>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <!-- Sidebar CSS -->
 <style>
@@ -17,7 +25,7 @@ $currentPage = basename($_SERVER['PHP_SELF']); // For active link highlighting
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* SIDEBAR */
@@ -68,30 +76,15 @@ body {
     transition: 0.3s;
 }
 
-.sidebar a i {
-    margin-right: 12px;
-    font-size: 18px;
-}
+.sidebar a i { margin-right: 12px; font-size: 18px; }
 
-.sidebar a:hover {
-    background-color: rgba(255,255,255,0.25);
-    transform: translateX(5px);
-}
+.sidebar a:hover { background-color: rgba(255,255,255,0.25); transform: translateX(5px); }
 
-.sidebar a.active {
-    background-color: rgba(255,255,255,0.35);
-}
+.sidebar a.active { background-color: rgba(255,255,255,0.35); }
 
 /* Responsive */
 @media (max-width: 900px) {
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        padding: 15px;
-        justify-content: space-around;
-    }
+    .sidebar { position: relative; width: 100%; height: auto; flex-direction: row; padding: 15px; justify-content: space-around; }
 }
 </style>
 
@@ -107,42 +100,41 @@ body {
         <a href="/brgy_iba/admin/dashboard.php" class="<?= $currentPage == 'dashboard.php' ? 'active' : '' ?>">
             <i class="fas fa-home"></i> Dashboard
         </a>
-        <a href="/brgy_iba/profile.php" class="<?= $currentPage == 'profile.php' ? 'active' : '' ?>">
-            <i class="fas fa-user"></i> Profile
-        </a>
-        <a href="/barangay-inventory/admin/users.php" class="<?= $currentPage == 'users.php' ? 'active' : '' ?>">
-            <i class="fas fa-users"></i> Manage Officials
-        </a>
-        <a href="/barangay-inventory/admin/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
-            <i class="fas fa-box"></i> Equipment
-        </a>
-        <a href="/barangay-inventory/admin/borrow.php" class="<?= $currentPage == 'borrow.php' ? 'active' : '' ?>">
-            <i class="fas fa-hand-holding"></i> Borrowed Items
-        </a>
-        <a href="/barangay-inventory/admin/return.php" class="<?= $currentPage == 'return.php' ? 'active' : '' ?>">
-            <i class="fas fa-undo"></i> Returned Items
-        </a>
-        <a href="/barangay-inventory/admin/requests.php" class="<?= $currentPage == 'requests.php' ? 'active' : '' ?>">
+
+        <a href="\brgy_iba\approval\requests_pending.php" class="<?= $currentPage == 'requests_pending.php' ? 'active' : '' ?>">
             <i class="fas fa-clipboard-check"></i> Approvals
         </a>
-        <a href="/barangay-inventory/admin/reports.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
+
+        <a href="/brgy_iba/admin/admin_returns.php" class="<?= $currentPage == 'admin_returns.php' ? 'active' : '' ?>">
+            <i class="fas fa-arrow-turn-up"></i> Returned Items
+        </a>
+
+
+        <a href="\brgy_iba\reports\report.php" class="<?= $currentPage == 'reports.php' ? 'active' : '' ?>">
             <i class="fas fa-chart-line"></i> Reports
         </a>
 
-    <?php elseif ($role === 'official'): ?>
-        <a href="/barangay-inventory/official/dashboard.php" class="<?= $currentPage == 'dashboard.php' ? 'active' : '' ?>">
+        <a href="/brgy_iba/maintenance/maintenance.php" class="<?= $currentPage == 'maintenance.php' ? 'active' : '' ?>">
+            <i class="fas fa-tools"></i> Maintenance
+        </a>
+
+    <?php elseif ($role === 'staff'): ?>
+        <a href="\brgy_iba\officials\dashboard.php" class="<?= $currentPage == 'dashboard.php' ? 'active' : '' ?>">
             <i class="fas fa-home"></i> Dashboard
         </a>
-        <a href="/barangay-inventory/official/stocks.php" class="<?= $currentPage == 'stocks.php' ? 'active' : '' ?>">
-            <i class="fas fa-boxes"></i> View Stocks
+
+        <a href="/brgy_iba/equipment/equipment.php" class="<?= $currentPage == 'equipment.php' ? 'active' : '' ?>">
+            <i class="fas fa-box"></i> Manage Stocks
         </a>
-        <a href="/barangay-inventory/official/request.php" class="<?= $currentPage == 'request.php' ? 'active' : '' ?>">
-            <i class="fas fa-file-alt"></i> Request Item
-        </a>
-        <a href="/barangay-inventory/official/my-requests.php" class="<?= $currentPage == 'my-requests.php' ? 'active' : '' ?>">
-            <i class="fas fa-list"></i> My Requests
+
+        <a href="/brgy_iba/equipment/maintenance.php" class="<?= $currentPage == 'maintenance.php' ? 'active' : '' ?>">
+            <i class="fas fa-tools"></i> Maintenance
         </a>
     <?php endif; ?>
+    
+    <a href="/brgy_iba/profile.php" class="<?= $currentPage == 'profile.php' ? 'active' : '' ?>">
+        <i class="fas fa-user"></i> Profile
+    </a>
 
     <a href="/brgy_iba/logout.php">
         <i class="fas fa-sign-out-alt"></i> Logout
