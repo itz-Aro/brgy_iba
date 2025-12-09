@@ -27,7 +27,7 @@ if (isset($_SESSION['user'])) {
 body {
     font-family: 'Poppins', sans-serif;
     /* background: linear-gradient(135deg, #b9c4f8ff 0%, #083d92 100%); */
-    /* background-color: #083d92; */
+    background-color: #083d92;
     background: url('asset/login-bg.png') center center / cover no-repeat;
     min-height: 100vh;
     display: flex;
@@ -38,11 +38,11 @@ body {
 
 .login-box {
     /* background: rgba(143, 35, 35, 0.95); */
-    backdrop-filter: blur(10px);
     /* border-radius: 20px; */
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    /* backdrop-filter: blur(10px); */
+    /* box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); */
     overflow: hidden;
-
+    /* background-color:transparent; */
    /* ✅ SAME AS WIDTH */
     display: flex;
     align-items: center;
@@ -188,6 +188,7 @@ button[type="submit"]:active {
 /* Logged In State */
 .logged-in-state {
     text-align: center;
+    margin-left:61px;
 }
 
 .logged-in-state p {
@@ -196,12 +197,12 @@ button[type="submit"]:active {
 }
 
 .logged-in-state strong {
-    color: #667eea;
+    color: #024093;
     font-size: 20px;
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(to right, #ff416c 0%, #ff4b2b 100%);
     color: white;
     width: 100%;
     padding: 12px;
@@ -252,9 +253,9 @@ button[type="submit"]:active {
 .modal-content h2 {
     margin-bottom: 25px;
     color: #333;
-    font-size: 28px;
+    font-size: 28px; 
     text-align: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2d7af5, #083d92 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -291,7 +292,8 @@ button[type="submit"]:active {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #ced6f8ff 0%, #2b05d4ff 100%);
+    background: linear-gradient(135deg, #2d7af5, #083d92);
+
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
