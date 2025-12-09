@@ -26,27 +26,27 @@ if (isset($_SESSION['user'])) {
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #b9c4f8ff 0%, #083d92 100%);
+    /* background: linear-gradient(135deg, #b9c4f8ff 0%, #083d92 100%); */
+    /* background-color: #083d92; */
+    background: url('asset/login-bg.png') center center / cover no-repeat;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
-    padding: 20px;
+    /* padding: 20px; */
 }
 
 .login-box {
-    background: rgba(143, 35, 35, 0.95);
+    /* background: rgba(143, 35, 35, 0.95); */
     backdrop-filter: blur(10px);
-    border-radius: 20px;
+    /* border-radius: 20px; */
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 
    /* ✅ SAME AS WIDTH */
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     animation: slideUp 0.5s ease-out;
 }
 
@@ -56,9 +56,10 @@ body {
 }
 
 .login-container {
-    width: 380px;
-    height: 460px;
-    padding: 28px;
+    width: 480px;
+    /* height: 460px; */
+    height:100vh;
+    padding: 28px 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -350,12 +351,12 @@ button[type="submit"]:active {
 <body>
 
 <div class="login-box">
-<?php if ($alreadyLoggedIn): ?>
-    <div class="logged-in-state">
-        <p>You are already logged in as <strong><?php echo ucfirst($role); ?></strong></p>
-        <a href="./logout.php" class="btn btn-danger">Logout</a>
-    </div>
-<?php else: ?>
+    <?php if ($alreadyLoggedIn): ?>
+        <div class="logged-in-state">
+            <p>You are already logged in as <strong><?php echo ucfirst($role); ?></strong></p>
+            <a href="./logout.php" class="btn btn-danger">Logout</a>
+        </div>
+    <?php else: ?>
     <form id="loginForm">
         <div class="login-container">
             <div class="login-logo"><img src="asset/logo.png" alt="Barangay Logo"></div>
@@ -378,7 +379,7 @@ button[type="submit"]:active {
             </p>
         </div>
     </form>
-<?php endif; ?>
+    <?php endif; ?>
 </div>
 
 <!-- Multi-Step Reset Modal -->
