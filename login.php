@@ -153,7 +153,7 @@ button[type="submit"] {
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    background: linear-gradient(135deg, #667eea 0%, #a09afdff 100%);
+    background: linear-gradient(135deg, #2d7af5, #083d92);
     color: white;
     margin-top: 4px;
 }
