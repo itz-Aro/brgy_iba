@@ -159,8 +159,10 @@ button[type="submit"]:active {
 
 /* Logged In State */
 .logged-in-state {
+    border-radius: 20px;
+    padding: 50px;
+    background-color: white;
     text-align: center;
-    margin-left:61px;
 }
 
 .logged-in-state p {
