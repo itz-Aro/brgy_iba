@@ -30,8 +30,10 @@ body {
     background-color: #083d92;
     background: url('asset/login-bg.png') center center / cover no-repeat;
     min-height: 100vh;
+    backdrop-filter: blur(10px);
+
     display: flex;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
     /* padding: 20px; */
 }
@@ -39,7 +41,6 @@ body {
 .login-box {
     /* background: rgba(143, 35, 35, 0.95); */
     /* border-radius: 20px; */
-    /* backdrop-filter: blur(10px); */
     /* box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); */
     overflow: hidden;
     /* background-color:transparent; */
@@ -57,8 +58,7 @@ body {
 
 .login-container {
     width: 480px;
-    /* height: 460px; */
-    height:100vh;
+    height: 500px;
     padding: 28px 60px;
     display: flex;
     flex-direction: column;
@@ -101,9 +101,10 @@ body {
     border: 1px solid #fcc;
 }
 
-.login-input {
-    /* margin:-10px; */
-}
+/* .login-input {
+    margin:-50px;
+    background-color:gray;
+} */
 
 .input-field {
     margin-bottom: 14px;
