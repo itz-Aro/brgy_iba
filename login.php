@@ -13,7 +13,7 @@ if (isset($_SESSION['user'])) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Barangay Login Portal</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/login.css">
 
 <!-- EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>

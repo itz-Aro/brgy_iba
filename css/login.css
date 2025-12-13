@@ -4,15 +4,6 @@
     box-sizing: border-box;
 }
 
-/* body {
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    font-family: 'Poppins', sans-serif;
-} */
-
 body {
     font-family: 'Poppins', sans-serif;
     background: url('../asset/login-bg.png') center center / cover no-repeat;
@@ -41,14 +32,14 @@ body {
     justify-content: center;
     gap: 15px;
     transition: all 0.3s ease;
-    width: 480px;
-    height: 500px;
-    padding: 28px 60px;
+    width: 430px;
+    height: 550px;
+    padding: 28px 50px;
 }
 
 .login-logo img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
 }
 
@@ -56,11 +47,10 @@ body {
     width: 100%;
 }
 
-
 .login-text h1 {
     text-transform: uppercase;
     text-align: center;
-    font-size: 25px;
+    font-size: 27px;
     font-weight: 700;
     margin-bottom: 6px;
     background: linear-gradient(135deg, #0f62e8ff 0%, #083d92 100%);
@@ -69,7 +59,7 @@ body {
 }
 
 .msg {
-    font-size: 12px;
+    font-size: 13px;
     text-align: center;
     margin: 8px 0;
     padding: 6px;
@@ -91,8 +81,6 @@ body {
     width: 100%;
     gap: 15px;
 }
-
-
 
 .input-field {
     margin-bottom: 14px;
