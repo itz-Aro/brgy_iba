@@ -83,7 +83,7 @@ function esc($v) {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: 'Poppins', sans-serif;
   color: #334155;
 }
 

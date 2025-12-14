@@ -50,7 +50,7 @@ body { font-family: 'Poppins', sans-serif; background:#f1f5f9; margin:0; }
 
 .top-header { 
     margin-bottom: 32px; 
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg,#083d92 0%, #0f62e8ff 100%);
     color: white; 
     border-radius: 20px; 
     padding: 36px 40px; 
