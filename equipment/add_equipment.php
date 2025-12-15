@@ -530,13 +530,11 @@ body {
           <select name="category" id="category" required>
             <option value="" disabled selected>Select Category</option>
             <option value="Furniture">Furniture</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Sports Equipment">Sports Equipment</option>
-            <option value="Laboratory Equipment">Laboratory Equipment</option>
-            <option value="IT Equipment">IT Equipment</option>
-            <option value="Office Supplies">Office Supplies</option>
-            <option value="Tools">Tools</option>
-            <option value="Others">Others</option>
+            <option value="Shelter / Event Equipment">Shelter / Event Equipment</option>
+            <option value="Tools / Gardening / Maintenance">Tools / Gardening / Maintenance</option>
+            <option value="Electronics / Equipment">Electronics / Equipment</option>
+            <option value="medical">Medical</option>
+          
           </select>
         </div>
       </div>
@@ -546,8 +544,8 @@ body {
           <i class="fas fa-align-left"></i>
           Description
         </label>
-        <textarea name="description" id="description" rows="3" 
-                  placeholder="Enter additional details about the equipment (optional)"></textarea>
+        <!-- <textarea name="description" id="description" rows="3" 
+                  placeholder="Enter additional details about the equipment (optional)"></textarea> -->
         <div class="helper-text">
           <i class="fas fa-circle"></i>
           Provide any additional information that might be helpful
