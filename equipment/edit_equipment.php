@@ -7,16 +7,15 @@ require_once __DIR__ . '/../config/Database.php';
 $db = new Database();
 $conn = $db->getConnection();
 
-// Check if ID is missing
+// Check ID
 if (!isset($_GET['id'])) {
     die("Missing equipment ID.");
 }
 
 $id = $_GET['id'];
-$success = '';
 $error = '';
 
-// Fetch the equipment
+// ================= FETCH EQUIPMENT =================
 $stmt = $conn->prepare("SELECT * FROM equipment WHERE id = ?");
 $stmt->execute([$id]);
 $equipment = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -25,12 +24,21 @@ if (!$equipment) {
     die("Equipment not found.");
 }
 
+// ================= FETCH PHOTO =================
+$photoStmt = $conn->prepare(
+    "SELECT * FROM equipment_photos WHERE equipment_id = ? LIMIT 1"
+);
+$photoStmt->execute([$id]);
+$photoData = $photoStmt->fetch(PDO::FETCH_ASSOC);
+
+$currentPhoto = $photoData['filename'] ?? null;
+
 $userName = htmlspecialchars($_SESSION['user']['name'] ?? 'User');
 
-// Handle form update
+// ================= UPDATE =================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $code = $_POST['code'];
+    $code = $_POST['code']; 
     $name = $_POST['name'];
     $description = $_POST['description'];
     $category = $_POST['category'];
@@ -39,54 +47,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $condition = $_POST['condition'];
     $location = $_POST['location'];
 
-   // PHOTO UPLOAD
-   $photo = $equipment['photo']; // keep old photo if no file is uploaded
+    // ---------- PHOTO UPLOAD ----------
+if (!empty($_FILES['photo']['name'])) {
 
-   if (!empty($_FILES['photo']['name'])) {
-       $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-       $photo = uniqid() . '.' . $ext; 
+    $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+    $photoName = uniqid() . '.' . $ext;
 
-       $uploadPath = __DIR__ . '/equipment_img/' . $photo;
+    // Save in equipment_photos folder
+    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/public/equipment_photos';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
 
-       // Create folder if not exists
-       if (!is_dir(__DIR__ . '/equipment_img')) {
-           mkdir(__DIR__ . '/equipment_img', 0777, true);
-       }
+    move_uploaded_file($_FILES['photo']['tmp_name'], $uploadDir . '/' . $photoName);
 
-       move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
+    // Relative path for DB and HTML
+    $relativePath = 'equipment_photos/' . $photoName;
 
-       // Store only filename in DB
-       $photo = "equipment_img/" . $photo;
-   }
-
-   $stmt = $conn->prepare("
-       UPDATE equipment SET
-           code = ?, name = ?, description = ?, category = ?, 
-           total_quantity = ?, available_quantity = ?, 
-           `condition` = ?, location = ?, photo = ?
-       WHERE id = ?
-   ");
-
-   $res = $stmt->execute([
-       $code, $name, $description, $category,
-       $total_quantity, $available_quantity,
-       $condition, $location, $photo, $id
-   ]);
-
-   if ($res) {
-       header("Location: equipment.php?updated=1");
-       exit();
-   } else {
-       $error = "Failed to update equipment.";
-   }
+    if ($photoData) {
+        // Update existing photo
+        $stmtPhoto = $conn->prepare(
+            "UPDATE equipment_photos 
+             SET filename = ?, uploaded_at = NOW()
+             WHERE equipment_id = ?"
+        );
+        $stmtPhoto->execute([$relativePath, $id]);
+    } else {
+        // Insert new photo
+        $stmtPhoto = $conn->prepare(
+            "INSERT INTO equipment_photos (equipment_id, filename)
+             VALUES (?, ?)"
+        );
+        $stmtPhoto->execute([$id, $relativePath]);
+    }
 }
 
+
+    // ---------- UPDATE EQUIPMENT ----------
+    $stmt = $conn->prepare("
+        UPDATE equipment SET
+            code = ?, name = ?, description = ?, category = ?, 
+            total_quantity = ?, available_quantity = ?, 
+            `condition` = ?, location = ?
+        WHERE id = ?
+    ");
+
+    $res = $stmt->execute([
+        $code, $name, $description, $category,
+        $total_quantity, $available_quantity,
+        $condition, $location, $id
+    ]);
+
+    if ($res) {
+        header("Location: equipment.php?updated=1");
+        exit();
+    } else {
+        $error = "Failed to update equipment.";
+    }
+}
 ?>
+
 
 <link rel="stylesheet" href="/public/css/dashboard.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
 <style>
+
 :root{
   --blue:#0d47a1;
   --blue-light:#1976d2;
@@ -518,6 +544,7 @@ body {
     padding:20px;
   }
 }
+
 </style>
 
 <main class="content-wrap">
@@ -723,16 +750,19 @@ body {
                 </div>
             </div>
 
-            <?php if (!empty($equipment['photo'])): ?>
-                <div class="current-photo">
-                    <span class="current-photo-label">
-                        <i class="fas fa-image"></i>
-                        Current Photo:
-                    </span>
-                    <img src="/public/<?= htmlspecialchars($equipment['photo']) ?>" 
-                         alt="<?= htmlspecialchars($equipment['name']) ?>">
-                </div>
-            <?php endif; ?>
+         <?php if ($currentPhoto): ?>
+    <div class="current-photo">
+        <span class="current-photo-label">
+            <i class="fas fa-image"></i>
+            Current Photo:
+        </span>
+       <img src="/<?= htmlspecialchars($currentPhoto) ?>" 
+     alt="<?= htmlspecialchars($equipment['name']) ?>">
+
+
+    </div>
+<?php endif; ?>
+
 
             <div class="image-preview" id="imagePreview">
                 <span class="image-preview-label">
