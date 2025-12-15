@@ -333,7 +333,7 @@ $displayRole = htmlspecialchars($role);
     <div class="title">Dashboard</div>
     <div class="admin-area">
       <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($displayRole)) ?>!</div>
-      <div class="avatar">AD</div>
+      <div class="avatar">OF</div>
     </div>
   </div>
 

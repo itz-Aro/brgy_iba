@@ -471,8 +471,8 @@ body {
       Add Equipment
     </div>
     <div class="admin-area">
-      <div class="greeting">Hello, <?= $userName ?>!</div>
-      <div class="avatar"><?= strtoupper(substr($userName, 0, 1)) ?></div>
+     <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
+      <div class="avatar">OF</div>
     </div>
   </div>
 

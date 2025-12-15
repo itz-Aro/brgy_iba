@@ -852,7 +852,7 @@ table tbody tr:hover {
         </div>
         <div class="admin-area">
           <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
-      <div class="avatar">AD</div>
+      <div class="avatar">OF</div>
         </div>
     </div>
 

@@ -221,7 +221,7 @@ body { font-family:'Poppins',sans-serif; background-color: var(--light-gray); co
     </div>
     <div class="admin-area">
           <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
-      <div class="avatar">AD</div>
+      <div class="avatar">OF</div>
     </div>
   </div>
 
