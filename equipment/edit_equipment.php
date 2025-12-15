@@ -7,80 +7,74 @@ require_once __DIR__ . '/../config/Database.php';
 $db = new Database();
 $conn = $db->getConnection();
 
-// Check if ID is missing
-if (!isset($_GET['id'])) {
-    die("Missing equipment ID.");
+$role = $_SESSION['user']['role'] ?? 'Admin';
+$displayRole = htmlspecialchars($role);
+$userName = htmlspecialchars($_SESSION['user']['name'] ?? 'User');
+
+// Get equipment ID from URL
+$equipmentId = $_GET['id'] ?? null;
+
+if (!$equipmentId) {
+    header("Location: equipment.php");
+    exit();
 }
 
-$id = $_GET['id'];
-$success = '';
-$error = '';
-
-// Fetch the equipment
+// Fetch existing equipment data
 $stmt = $conn->prepare("SELECT * FROM equipment WHERE id = ?");
-$stmt->execute([$id]);
+$stmt->execute([$equipmentId]);
 $equipment = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$equipment) {
-    die("Equipment not found.");
+    header("Location: equipment.php?error=notfound");
+    exit();
 }
 
-$userName = htmlspecialchars($_SESSION['user']['name'] ?? 'User');
-
-// Handle form update
+// Handle form submission
+$error = '';
+$success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $category = $_POST['category'] ?? '';
+    $total_quantity = $_POST['total_quantity'] ?? 0;
+    $available_quantity = $_POST['available_quantity'] ?? 0;
+    $condition = $_POST['condition'] ?? 'Good';
+    $location = $_POST['location'] ?? '';
 
-    $code = $_POST['code'];
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    $category = $_POST['category'];
-    $total_quantity = $_POST['total_quantity'];
-    $available_quantity = $_POST['available_quantity'];
-    $condition = $_POST['condition'];
-    $location = $_POST['location'];
+    // Handle photo upload
+    $photo = $equipment['photo']; // Keep existing photo by default
+    if (!empty($_FILES['photo']['name'])) {
+        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+        $photo = uniqid() . '.' . $ext;
 
-   // PHOTO UPLOAD
-   $photo = $equipment['photo']; // keep old photo if no file is uploaded
+        $uploadPath = __DIR__ . '/equipment_img/' . $photo;
 
-   if (!empty($_FILES['photo']['name'])) {
-       $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-       $photo = uniqid() . '.' . $ext; 
+        if (!is_dir(__DIR__ . '/equipment_img')) {
+            mkdir(__DIR__ . '/equipment_img', 0777, true);
+        }
 
-       $uploadPath = __DIR__ . '/equipment_img/' . $photo;
+        // Delete old photo if exists
+        if ($equipment['photo'] && file_exists(__DIR__ . '/equipment_img/' . $equipment['photo'])) {
+            unlink(__DIR__ . '/equipment_img/' . $equipment['photo']);
+        }
 
-       // Create folder if not exists
-       if (!is_dir(__DIR__ . '/equipment_img')) {
-           mkdir(__DIR__ . '/equipment_img', 0777, true);
-       }
+        move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
+    }
 
-       move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
+    // Update database
+    $stmt = $conn->prepare("UPDATE equipment 
+        SET name=?, description=?, category=?, total_quantity=?, available_quantity=?, `condition`=?, location=?, photo=?
+        WHERE id=?");
 
-       // Store only filename in DB
-       $photo = "equipment_img/" . $photo;
-   }
+    $res = $stmt->execute([$name, $description, $category, $total_quantity, $available_quantity, $condition, $location, $photo, $equipmentId]);
 
-   $stmt = $conn->prepare("
-       UPDATE equipment SET
-           code = ?, name = ?, description = ?, category = ?, 
-           total_quantity = ?, available_quantity = ?, 
-           `condition` = ?, location = ?, photo = ?
-       WHERE id = ?
-   ");
-
-   $res = $stmt->execute([
-       $code, $name, $description, $category,
-       $total_quantity, $available_quantity,
-       $condition, $location, $photo, $id
-   ]);
-
-   if ($res) {
-       header("Location: equipment.php?updated=1");
-       exit();
-   } else {
-       $error = "Failed to update equipment.";
-   }
+    if ($res) {
+        header("Location: equipment.php?updated=1");
+        exit();
+    } else {
+        $error = "Failed to update equipment. Please try again.";
+    }
 }
-
 ?>
 
 <link rel="stylesheet" href="/public/css/dashboard.css">
@@ -89,15 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <style>
 :root{
   --blue:#0d47a1;
-  --blue-light:#0f62e8ff;
+  --blue-light:#1976d2;
   --blue-dark:#083d97;
   --light-gray:#f5f7fa;
   --card-shadow:0 6px 20px rgba(15,23,42,0.08);
   --hover-shadow:0 8px 24px rgba(15,23,42,0.12);
   --radius:14px;
   --success:#4caf50;
-  --danger:#f44336;
   --warning:#ff9800;
+  --danger:#f44336;
 }
 
 * {
@@ -121,14 +115,14 @@ body {
 }
 
 .top-header{ 
-  background-color:#0f62e8ff; 
+  background-color:var(--blue); 
   color:white; 
   border-radius:16px; 
   padding:32px 40px; 
   display:flex; 
   justify-content:space-between; 
   align-items:center; 
-  box-shadow:0 8px 20px rgba(255,152,0,0.2);
+  box-shadow:0 8px 20px rgba(13,71,161,0.2);
   margin-bottom:28px;
 }
 
@@ -162,7 +156,7 @@ body {
   height:58px; 
   border-radius:50%; 
   background:white; 
-  color:#0f62e8ff; 
+  color:var(--blue); 
   display:flex; 
   justify-content:center; 
   align-items:center; 
@@ -191,41 +185,17 @@ body {
 
 .form-card h2{ 
   margin-top:0; 
-  color:#0f62e8ff; 
+  color:var(--blue); 
   margin-bottom:24px;
-  font-size:22px;
+  font-size:28px;
   font-weight:800;
   display:flex;
   align-items:center;
   gap:12px;
 }
 
-.equipment-info {
-  background: #f8f8f8ff;
-  border-left:4px solid #0f62e8ff;
-  padding:16px;
-  border-radius:8px;
-  margin-bottom:24px;
-  font-size:14px;
-    color:var(--blue-light);
-
-}
-
-.equipment-info strong {
-  display:block;
-  font-size:16px;
-  color:var(--blue);
-}
-
-.equipment-info .detail {
-  display:flex;
-  gap:8px;
-  margin:13px 0;
-  align-items:center;
-}
-
-.equipment-info .detail i {
-  width:20px;
+.form-card h2 i {
+  font-size:26px;
 }
 
 .section-divider {
@@ -237,7 +207,7 @@ body {
 .section-title {
   font-size:16px;
   font-weight:700;
-  color:#0f62e8ff;
+  color:var(--blue);
   margin-bottom:16px;
   text-transform:uppercase;
   letter-spacing:0.5px;
@@ -278,7 +248,7 @@ body {
 }
 
 .form-group label i {
-  color:#0f62e8ff;
+  color:var(--blue);
 }
 
 .required::after {
@@ -304,15 +274,16 @@ body {
 .form-group textarea:focus, 
 .form-group select:focus{ 
   outline:none;
-  border-color:#0f62e8ff;
+  border-color:var(--blue);
   background:white;
-  box-shadow:0 0 0 4px rgba(255,152,0,0.1);
+  box-shadow:0 0 0 4px rgba(13,71,161,0.1);
 }
 
 .form-group input[readonly] {
   background:#e0e7ef;
   color:#64748b;
   cursor:not-allowed;
+  font-weight:700;
 }
 
 .form-group textarea {
@@ -348,7 +319,7 @@ body {
 }
 
 .file-input-label:hover {
-  border-color:#0f62e8ff;
+  border-color:var(--blue);
   background:white;
 }
 
@@ -359,79 +330,38 @@ body {
 .file-name {
   margin-top:8px;
   font-size:13px;
-  color:#0f62e8ff;
-  font-weight:600;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.current-photo {
-  margin-top:16px;
-  padding:16px;
-  background:#f8fafc;
-  border-radius:10px;
-  border:2px solid #e0e7ef;
-}
-
-.current-photo-label {
-  font-size:13px;
-  font-weight:600;
-  color:#64748b;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.current-photo-label i {
   color:var(--blue);
-}
-
-.current-photo img {
-  max-width:200px;
-  max-height:200px;
-  border-radius:10px;
-  border:2px solid #e0e7ef;
-  object-fit:cover;
-  display:block;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 
 .image-preview {
   margin-top:12px;
-  display:none;
-}
-
-.image-preview-label {
-  font-size:13px;
-  font-weight:600;
-  color:#0f62e8ff;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:6px;
 }
 
 .image-preview img {
   max-width:200px;
   max-height:200px;
   border-radius:10px;
-  border:2px solid #0f62e8ff;
+  border:2px solid #e0e7ef;
   object-fit:cover;
 }
 
-.helper-text {
-  font-size:12px;
-  color:#64748b;
-  margin-top:4px;
-  font-style:italic;
-  display:flex;
-  align-items:center;
-  gap:4px;
+.current-photo {
+  margin-top:12px;
+  padding:12px;
+  background:#f0f9ff;
+  border-radius:10px;
+  border:2px solid #bae6fd;
 }
 
-.helper-text i {
-  font-size:10px;
+.current-photo p {
+  font-size:13px;
+  color:#0c4a6e;
+  margin-bottom:8px;
+  font-weight:600;
 }
 
 .form-actions {
@@ -443,7 +373,7 @@ body {
 }
 
 .submit-btn{ 
-  background: linear-gradient(135deg, #2d7af5, #083d97);
+  background:linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%); 
   color:white; 
   border:none; 
   padding:14px 28px; 
@@ -456,12 +386,11 @@ body {
   align-items:center;
   gap:8px;
   box-shadow:0 4px 12px rgba(255,152,0,0.3);
-  font-family:'Poppins',sans-serif
 }
 
 .submit-btn:hover{ 
   transform:translateY(-2px);
-  box-shadow:0 6px 16px rgba(0, 60, 137, 0.4);
+  box-shadow:0 6px 16px rgba(255,152,0,0.4);
 }
 
 .cancel-btn{ 
@@ -500,6 +429,41 @@ body {
   font-size:24px;
 }
 
+.info-box {
+  background:#fff3e0;
+  border-left:4px solid var(--warning);
+  padding:16px;
+  border-radius:8px;
+  margin-bottom:20px;
+  font-size:14px;
+  color:#e65100;
+}
+
+.info-box strong {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:4px;
+}
+
+.info-box strong i {
+  font-size:16px;
+}
+
+.helper-text {
+  font-size:12px;
+  color:#64748b;
+  margin-top:4px;
+  font-style:italic;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.helper-text i {
+  font-size:10px;
+}
+
 @media (max-width: 768px) {
   .content-wrap {
     margin-left:0;
@@ -523,241 +487,219 @@ body {
 </style>
 
 <main class="content-wrap">
-
-    <div class="top-header">
-        <div class="title">
-            <i class="fas fa-edit title-icon"></i>
-            Edit Equipment
-        </div>
-        <div class="admin-area">
-            <div class="greeting">Hello, <?= $userName ?>!</div>
-            <div class="avatar"><?= strtoupper(substr($userName, 0, 1)) ?></div>
+  <div class="top-header">
+    <div class="title">
+      <i class="fas fa-edit title-icon"></i>
+      Update Equipment
+    </div>
+    <div class="admin-area">
+       <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
+      <div class="avatar">AD</div>
         </div>
     </div>
+  </div>
 
-    <div class="form-card">
-        <h2>
-            <!-- <i class="fas fa-file-edit"></i> -->
-            Equipment Details:
-        </h2>
+  <div class="form-card">
+    <h2>
+      <i class="fas fa-box"></i>
+      Edit Equipment Details
+    </h2>
 
-        <?php if($error): ?>
-            <div class="alert-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <?= $error ?>
-            </div>
+    <?php if($error): ?>
+      <div class="alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <?= $error ?>
+      </div>
+    <?php endif; ?>
+
+    <div class="info-box">
+      <strong>
+        <i class="fas fa-barcode"></i>
+        Equipment Code: <?= htmlspecialchars($equipment['code']) ?>
+      </strong>
+      Equipment code cannot be changed after creation.
+    </div>
+
+    <form action="" method="POST" enctype="multipart/form-data" id="equipmentForm">
+
+      <!-- BASIC INFORMATION -->
+      <div class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Basic Information
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name" class="required">
+            <i class="fas fa-tag"></i>
+            Equipment Name
+          </label>
+          <input type="text" name="name" id="name" required 
+                 placeholder="e.g., Laptop, Projector, Desk"
+                 value="<?= htmlspecialchars($equipment['name']) ?>">
+          <div class="helper-text">
+            <i class="fas fa-circle"></i>
+            Enter the name of the equipment
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category" class="required">
+            <i class="fas fa-folder-open"></i>
+            Category
+          </label>
+          <select name="category" id="category" required>
+            <option value="" disabled>Select Category</option>
+            <option value="Furniture" <?= $equipment['category'] === 'Furniture' ? 'selected' : '' ?>>Furniture</option>
+            <option value="Shelter / Event Equipment" <?= $equipment['category'] === 'Shelter / Event Equipment' ? 'selected' : '' ?>>Shelter / Event Equipment</option>
+            <option value="Tools / Gardening / Maintenance" <?= $equipment['category'] === 'Tools / Gardening / Maintenance' ? 'selected' : '' ?>>Tools / Gardening / Maintenance</option>
+            <option value="Electronics / Equipment" <?= $equipment['category'] === 'Electronics / Equipment' ? 'selected' : '' ?>>Electronics / Equipment</option>
+            <option value="medical" <?= $equipment['category'] === 'medical' ? 'selected' : '' ?>>medical</option>
+    
+          </select>
+        </div>
+      </div>
+
+      <!-- <div class="form-group full-width">
+        <label for="description">
+          <i class="fas fa-align-left"></i>
+          Description
+        </label>
+        <textarea name="description" id="description" rows="3" 
+                  placeholder="Enter additional details about the equipment (optional)"><?= htmlspecialchars($equipment['description']) ?></textarea>
+        <div class="helper-text">
+          <i class="fas fa-circle"></i>
+          Provide any additional information that might be helpful
+        </div>
+      </div> -->
+
+      <hr class="section-divider">
+
+      <!-- QUANTITY & CONDITION -->
+      <div class="section-title">
+        <i class="fas fa-calculator"></i>
+        Quantity & Condition
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="total_quantity" class="required">
+            <i class="fas fa-boxes"></i>
+            Total Quantity
+          </label>
+          <input type="number" name="total_quantity" id="total_quantity" 
+                 required min="1" value="<?= htmlspecialchars($equipment['total_quantity']) ?>">
+          <div class="helper-text">
+            <i class="fas fa-circle"></i>
+            How many units do you have?
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="available_quantity" class="required">
+            <i class="fas fa-check-circle"></i>
+            Available Quantity
+          </label>
+          <input type="number" name="available_quantity" id="available_quantity" 
+                 required min="0" value="<?= htmlspecialchars($equipment['available_quantity']) ?>">
+          <div class="helper-text">
+            <i class="fas fa-circle"></i>
+            How many units are currently available?
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="condition" class="required">
+          <i class="fas fa-clipboard-check"></i>
+          Condition
+        </label>
+        <select name="condition" id="condition">
+          <option value="Good" <?= $equipment['condition'] === 'Good' ? 'selected' : '' ?>>Good</option>
+          <option value="Fair" <?= $equipment['condition'] === 'Fair' ? 'selected' : '' ?>>Fair</option>
+          <option value="Damaged" <?= $equipment['condition'] === 'Damaged' ? 'selected' : '' ?>>Damaged</option>
+        </select>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- LOCATION -->
+      <div class="section-title">
+        <i class="fas fa-map-marker-alt"></i>
+        Location
+      </div>
+
+      <div class="form-group">
+        <label for="location" class="required">
+          <i class="fas fa-warehouse"></i>
+          Storage Location
+        </label>
+        <select name="location" id="location" required>
+          <option value="Barangay Iba, Taal, Batangas" <?= $equipment['location'] === 'Barangay Iba, Taal, Batangas' ? 'selected' : '' ?>>Barangay Iba, Taal, Batangas</option>
+        </select>
+        <div class="helper-text">
+          <i class="fas fa-circle"></i>
+          Where is this equipment stored?
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <!-- PHOTO UPLOAD -->
+      <div class="section-title">
+        <i class="fas fa-camera"></i>
+        Equipment Photo
+      </div>
+
+      <div class="form-group">
+        <label for="photo">
+          <i class="fas fa-image"></i>
+          Upload New Photo (Optional)
+        </label>
+        
+        <?php if($equipment['photo']): ?>
+          <div class="current-photo">
+            <p><i class="fas fa-image"></i> Current Photo:</p>
+            <img src="equipment_img/<?= htmlspecialchars($equipment['photo']) ?>" 
+                 alt="Current equipment photo" 
+                 style="max-width:200px; max-height:200px; border-radius:10px; object-fit:cover;">
+          </div>
         <?php endif; ?>
 
-        <div class="equipment-info">
-            <strong><i class="fas fa-box"></i> Current Equipment Information</strong>
-            <div class="detail">
-                <i class="fas fa-barcode"></i>
-                <strong>Code:</strong> <?= htmlspecialchars($equipment['code']) ?>
-            </div>
-            <div class="detail">
-                <i class="fas fa-tag"></i>
-                <strong>Name:</strong> <?= htmlspecialchars($equipment['name']) ?>
-            </div>
-            <div class="detail">
-                <i class="fas fa-folder"></i>
-                <strong>Category:</strong> <?= htmlspecialchars($equipment['category']) ?>
-            </div>
+        <div class="file-input-wrapper" style="margin-top:12px;">
+          <input type="file" name="photo" id="photo" accept="image/*" onchange="previewImage(this)">
+          <label for="photo" class="file-input-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="fileLabel">Choose a new photo to replace current one</span>
+          </label>
         </div>
+        <div class="file-name" id="fileName"></div>
+        <div class="image-preview" id="imagePreview" style="display:none;">
+          <p style="font-size:13px; color:#0c4a6e; margin-bottom:8px; font-weight:600;">
+            <i class="fas fa-eye"></i> New Photo Preview:
+          </p>
+          <img id="previewImg" src="" alt="Preview">
+        </div>
+        <div class="helper-text">
+          <i class="fas fa-circle"></i>
+          Leave empty to keep current photo. Supported formats: JPG, PNG, GIF (Max 5MB)
+        </div>
+      </div>
 
-        <form method="POST" enctype="multipart/form-data" id="editForm">
+      <!-- FORM ACTIONS -->
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-save"></i>
+          Update Equipment
+        </button>
+        <a href="equipment.php" class="cancel-btn">
+          <i class="fas fa-times"></i>
+          Cancel
+        </a>
+      </div>
 
-            <!-- BASIC INFORMATION -->
-            <div class="section-title">
-                <i class="fas fa-info-circle"></i>
-                Basic Information
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-barcode"></i>
-                        Equipment Code
-                    </label>
-                    <input type="text" name="code" required value="<?= htmlspecialchars($equipment['code']) ?>">
-                    <div class="helper-text">
-                        <i class="fas fa-circle"></i>
-                        Unique identifier for this equipment
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-tag"></i>
-                        Equipment Name
-                    </label>
-                    <input type="text" name="name" required value="<?= htmlspecialchars($equipment['name']) ?>">
-                    <div class="helper-text">
-                        <i class="fas fa-circle"></i>
-                        Full name of the equipment
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-folder-open"></i>
-                    Category
-                </label>
-                <select name="category" required>
-                    <option value="">Select Category</option>
-                    <option value="Furniture" <?= $equipment['category'] == 'Furniture' ? 'selected' : '' ?>>Furniture</option>
-                    <option value="Electronics" <?= $equipment['category'] == 'Electronics' ? 'selected' : '' ?>>Electronics</option>
-                    <option value="Sports Equipment" <?= $equipment['category'] == 'Sports Equipment' ? 'selected' : '' ?>>Sports Equipment</option>
-                    <option value="Laboratory Equipment" <?= $equipment['category'] == 'Laboratory Equipment' ? 'selected' : '' ?>>Laboratory Equipment</option>
-                    <option value="IT Equipment" <?= $equipment['category'] == 'IT Equipment' ? 'selected' : '' ?>>IT Equipment</option>
-                    <option value="Office Supplies" <?= $equipment['category'] == 'Office Supplies' ? 'selected' : '' ?>>Office Supplies</option>
-                    <option value="Tools" <?= $equipment['category'] == 'Tools' ? 'selected' : '' ?>>Tools</option>
-                    <option value="Others" <?= $equipment['category'] == 'Others' ? 'selected' : '' ?>>Others</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-align-left"></i>
-                    Description
-                </label>
-                <textarea name="description" rows="3" placeholder="Enter additional details..."><?= htmlspecialchars($equipment['description']) ?></textarea>
-                <div class="helper-text">
-                    <i class="fas fa-circle"></i>
-                    Additional information about this equipment
-                </div>
-            </div>
-
-            <hr class="section-divider">
-
-            <!-- QUANTITY & CONDITION -->
-            <div class="section-title">
-                <i class="fas fa-calculator"></i>
-                Quantity & Condition
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-boxes"></i>
-                        Total Quantity
-                    </label>
-                    <input type="number" name="total_quantity" min="1" required 
-                           value="<?= htmlspecialchars($equipment['total_quantity']) ?>">
-                    <div class="helper-text">
-                        <i class="fas fa-circle"></i>
-                        Total units owned
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="required">
-                        <i class="fas fa-check-circle"></i>
-                        Available Quantity
-                    </label>
-                    <input type="number" name="available_quantity" min="0" required 
-                           value="<?= htmlspecialchars($equipment['available_quantity']) ?>"
-                           id="availableQty">
-                    <div class="helper-text">
-                        <i class="fas fa-circle"></i>
-                        Units currently available
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="required">
-                    <i class="fas fa-clipboard-check"></i>
-                    Condition
-                </label>
-                <select name="condition">
-                    <option value="Good" <?= $equipment['condition'] == 'Good' ? 'selected' : '' ?>>Good</option>
-                    <option value="Fair" <?= $equipment['condition'] == 'Fair' ? 'selected' : '' ?>>Fair</option>
-                    <option value="Damaged" <?= $equipment['condition'] == 'Damaged' ? 'selected' : '' ?>>Damaged</option>
-                </select>
-            </div>
-
-            <hr class="section-divider">
-
-            <!-- LOCATION -->
-            <div class="section-title">
-                <i class="fas fa-map-marker-alt"></i>
-                Location
-            </div>
-
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-warehouse"></i>
-                    Storage Location
-                </label>
-                <input type="text" name="location" value="<?= htmlspecialchars($equipment['location']) ?>" 
-                       placeholder="e.g., Barangay Iba, Taal, Batangas">
-                <div class="helper-text">
-                    <i class="fas fa-circle"></i>
-                    Where is this equipment stored?
-                </div>
-            </div>
-
-            <hr class="section-divider">
-
-            <!-- PHOTO -->
-            <div class="section-title">
-                <i class="fas fa-camera"></i>
-                Equipment Photo
-            </div>
-
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-image"></i>
-                    Update Photo (Optional)
-                </label>
-                <div class="file-input-wrapper">
-                    <input type="file" name="photo" id="photo" accept="image/*" onchange="previewImage(this)">
-                    <label for="photo" class="file-input-label">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span id="fileLabel">Choose new photo to replace current</span>
-                    </label>
-                </div>
-                <div class="file-name" id="fileName"></div>
-                <div class="helper-text">
-                    <i class="fas fa-circle"></i>
-                    Leave empty to keep current photo
-                </div>
-            </div>
-
-            <?php if (!empty($equipment['photo'])): ?>
-                <div class="current-photo">
-                    <span class="current-photo-label">
-                        <i class="fas fa-image"></i>
-                        Current Photo:
-                    </span>
-                    <img src="/public/<?= htmlspecialchars($equipment['photo']) ?>" 
-                         alt="<?= htmlspecialchars($equipment['name']) ?>">
-                </div>
-            <?php endif; ?>
-
-            <div class="image-preview" id="imagePreview">
-                <span class="image-preview-label">
-                    <i class="fas fa-sparkles"></i>
-                    New Photo Preview:
-                </span>
-                <img id="previewImg" src="" alt="Preview">
-            </div>
-
-            <!-- FORM ACTIONS -->
-            <div class="form-actions">
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-save"></i>
-                    Update Equipment
-                </button>
-                <a href="equipment.php" class="cancel-btn">
-                    <i class="fas fa-times"></i>
-                    Cancel
-                </a>
-            </div>
-
-        </form>
-    </div>
+    </form>
+  </div>
 </main>
 
 <script>
@@ -783,19 +725,25 @@ function previewImage(input) {
 }
 
 // Form validation
-document.getElementById('editForm').addEventListener('submit', function(e) {
-  const totalQty = parseInt(document.querySelector('input[name="total_quantity"]').value);
-  const availableQty = parseInt(document.getElementById('availableQty').value);
-  
-  if (availableQty > totalQty) {
-    e.preventDefault();
-    alert('Available quantity cannot exceed total quantity!');
-    return false;
-  }
+document.getElementById('equipmentForm').addEventListener('submit', function(e) {
+  const totalQty = parseInt(document.getElementById('total_quantity').value);
+  const availableQty = parseInt(document.getElementById('available_quantity').value);
   
   if (totalQty < 1) {
     e.preventDefault();
     alert('Total quantity must be at least 1');
+    return false;
+  }
+
+  if (availableQty > totalQty) {
+    e.preventDefault();
+    alert('Available quantity cannot be greater than total quantity');
+    return false;
+  }
+
+  if (availableQty < 0) {
+    e.preventDefault();
+    alert('Available quantity cannot be negative');
     return false;
   }
 });

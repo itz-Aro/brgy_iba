@@ -222,7 +222,7 @@ body {
 
 .top-header{
   margin-bottom:28px;
-  background:linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+ background: var(--blue);   
   color:white;
   border-radius:16px;
   padding:32px 40px;
@@ -470,12 +470,13 @@ body {
   
   .table-container {
     box-shadow: none;
+  
   }
   
   table th {
-    background-color: #f0f0f0 !important;
+    background-color: #f0f0f0ff ;
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  
   }
 }
 
@@ -515,7 +516,7 @@ body {
 
 .stat-label {
   font-size:14px;
-  color:#64748b;
+  color:black;
   font-weight:600;
   text-transform:uppercase;
   letter-spacing:0.5px;
@@ -528,7 +529,7 @@ body {
 .stat-value {
   font-size:32px;
   font-weight:800;
-  color:var(--blue);
+  color:black;
 }
 
 .table-container {
@@ -573,9 +574,9 @@ table th, table td {
 }
 
 table th {
-  background-color:#f8fafc;
+  background-color:#083d97;
   font-weight:700;
-  color:var(--blue);
+  color:white;
   font-size:13px;
   text-transform:uppercase;
   letter-spacing:0.5px;
@@ -850,8 +851,8 @@ table tbody tr:hover {
             Equipment Maintenance Status
         </div>
         <div class="admin-area">
-            <div class="greeting">Hello, <?= $userName ?>!</div>
-            <div class="avatar"><?= strtoupper(substr($userName, 0, 1)) ?></div>
+          <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
+      <div class="avatar">AD</div>
         </div>
     </div>
 
