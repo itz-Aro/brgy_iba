@@ -551,18 +551,16 @@ body {
           <select name="category" id="category" required>
             <option value="" disabled>Select Category</option>
             <option value="Furniture" <?= $equipment['category'] === 'Furniture' ? 'selected' : '' ?>>Furniture</option>
-            <option value="Electronics" <?= $equipment['category'] === 'Electronics' ? 'selected' : '' ?>>Electronics</option>
-            <option value="Sports Equipment" <?= $equipment['category'] === 'Sports Equipment' ? 'selected' : '' ?>>Sports Equipment</option>
-            <option value="Laboratory Equipment" <?= $equipment['category'] === 'Laboratory Equipment' ? 'selected' : '' ?>>Laboratory Equipment</option>
-            <option value="IT Equipment" <?= $equipment['category'] === 'IT Equipment' ? 'selected' : '' ?>>IT Equipment</option>
-            <option value="Office Supplies" <?= $equipment['category'] === 'Office Supplies' ? 'selected' : '' ?>>Office Supplies</option>
-            <option value="Tools" <?= $equipment['category'] === 'Tools' ? 'selected' : '' ?>>Tools</option>
-            <option value="Others" <?= $equipment['category'] === 'Others' ? 'selected' : '' ?>>Others</option>
+            <option value="Shelter / Event Equipment" <?= $equipment['category'] === 'Shelter / Event Equipment' ? 'selected' : '' ?>>Shelter / Event Equipment</option>
+            <option value="Tools / Gardening / Maintenance" <?= $equipment['category'] === 'Tools / Gardening / Maintenance' ? 'selected' : '' ?>>Tools / Gardening / Maintenance</option>
+            <option value="Electronics / Equipment" <?= $equipment['category'] === 'Electronics / Equipment' ? 'selected' : '' ?>>Electronics / Equipment</option>
+            <option value="medical" <?= $equipment['category'] === 'medical' ? 'selected' : '' ?>>medical</option>
+    
           </select>
         </div>
       </div>
 
-      <div class="form-group full-width">
+      <!-- <div class="form-group full-width">
         <label for="description">
           <i class="fas fa-align-left"></i>
           Description
@@ -573,7 +571,7 @@ body {
           <i class="fas fa-circle"></i>
           Provide any additional information that might be helpful
         </div>
-      </div>
+      </div> -->
 
       <hr class="section-divider">
 

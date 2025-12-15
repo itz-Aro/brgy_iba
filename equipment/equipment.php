@@ -335,6 +335,7 @@ body { font-family:'Poppins',sans-serif; background-color: var(--light-gray); co
     </table>
   </div>
 
+  
 </main>
 
 <!-- PHOTO MODAL -->
