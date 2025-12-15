@@ -222,7 +222,7 @@ body {
 
 .top-header{
   margin-bottom:28px;
- background: var(--blue); 
+ background: var(--blue);   
   color:white;
   border-radius:16px;
   padding:32px 40px;
@@ -515,7 +515,7 @@ body {
 
 .stat-label {
   font-size:14px;
-  color:#64748b;
+  color:black;
   font-weight:600;
   text-transform:uppercase;
   letter-spacing:0.5px;
@@ -528,7 +528,7 @@ body {
 .stat-value {
   font-size:32px;
   font-weight:800;
-  color:var(--blue);
+  color:black;
 }
 
 .table-container {
