@@ -470,12 +470,13 @@ body {
   
   .table-container {
     box-shadow: none;
+  
   }
   
   table th {
-    background-color: #f0f0f0 !important;
+    background-color: #f0f0f0ff ;
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  
   }
 }
 
@@ -573,9 +574,9 @@ table th, table td {
 }
 
 table th {
-  background-color:#f8fafc;
+  background-color:#083d97;
   font-weight:700;
-  color:var(--blue);
+  color:white;
   font-size:13px;
   text-transform:uppercase;
   letter-spacing:0.5px;

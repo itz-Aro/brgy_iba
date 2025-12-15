@@ -175,7 +175,7 @@ body { font-family:'Poppins',sans-serif; background-color: var(--light-gray); co
 .table-container { background:white; border-radius:var(--radius); box-shadow:var(--card-shadow); overflow:hidden; margin-bottom:24px; }
 .equipment-table{ width:100%; border-collapse:collapse; }
 .equipment-table th, .equipment-table td{ padding:16px 20px; text-align:left; font-size:14px; border-bottom:1px solid #f1f3f6; }
-.equipment-table th{ background:#f8fafc; font-weight:700; color:var(--blue); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+.equipment-table th{ background:#083d97; font-weight:700; color:white; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
 .equipment-table tbody tr { transition:all 0.15s; }
 .equipment-table tbody tr:hover { background-color:#f8fafc; }
 .equipment-table td img{ width:56px; height:56px; border-radius:10px; object-fit:cover; cursor:pointer; border:2px solid #e0e7ef; transition:all 0.2s; }
