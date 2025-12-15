@@ -13,7 +13,8 @@ body {
 .sidebar {
     width: 250px;
     height: 100vh;
-    background: linear-gradient(180deg, #1E3A8A, #3B82F6);
+    background-color: #083d92;
+
     padding: 30px 15px;
     color: white;
     position: fixed;
@@ -61,7 +62,10 @@ body {
 
 .sidebar a:hover { background-color: rgba(255,255,255,0.25); transform: translateX(5px); }
 
-.sidebar a.active { background-color: rgba(255,255,255,0.35); }
+/* .sidebar a.active { background-color: rgba(255,255,255,0.35); } */
+.sidebar a.active {
+    background-color: #2d7af5;
+}
 
 /* Responsive */
 @media (max-width: 900px) {
