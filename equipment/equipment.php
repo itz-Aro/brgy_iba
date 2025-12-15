@@ -54,8 +54,8 @@ $userName = htmlspecialchars($_SESSION['user']['name'] ?? 'User');
 <style>
 :root{
   --blue:#0d47a1;
-  --blue-light:#1976d2;
-  --blue-dark:#003c8f;
+  --blue-light:#0f62e8ff;
+  --blue-dark:#083d97;  
   --light-gray:#f5f7fa;
   --card-shadow:0 6px 20px rgba(15,23,42,0.08);
   --hover-shadow:0 8px 24px rgba(15,23,42,0.12);
@@ -73,7 +73,7 @@ $userName = htmlspecialchars($_SESSION['user']['name'] ?? 'User');
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color: var(--light-gray);
   color: #2c3e50;
 }
@@ -100,7 +100,7 @@ body {
 
 .top-header .title{ 
   font-size:38px; 
-  font-weight:800; 
+  font-weight:bold; 
   letter-spacing:-0.8px;
   display:flex;
   align-items:center;
