@@ -270,7 +270,7 @@ body {
 }
 
 .filter-box select {
-  padding:12px 16px;
+  padding:12px 5px;
   border:2px solid #e0e7ef;
   border-radius:12px;
   font-size:15px;
@@ -287,6 +287,7 @@ body {
 }
 
 .btn {
+  font-family:'Poppins', sans-serif;
   padding:12px 20px;
   border-radius:12px;
   font-weight:600;
@@ -426,6 +427,7 @@ body {
   text-decoration:none;
   display:inline-flex;
   align-items:center;
+  width: 70%;
   gap:6px;
 }
 
