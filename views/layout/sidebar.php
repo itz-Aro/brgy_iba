@@ -118,7 +118,7 @@ body {
             <i class="fas fa-tools"></i> Maintenance
         </a>
 
-    <?php elseif ($role === 'staff'): ?>
+    <?php elseif ($role === 'official'): ?>
         <a href="\brgy_iba\officials\dashboard.php" class="<?= $currentPage == 'dashboard.php' ? 'active' : '' ?>">
             <i class="fas fa-home"></i> Dashboard
         </a>
