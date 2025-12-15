@@ -222,7 +222,7 @@ body {
 
 .top-header{
   margin-bottom:28px;
-  background:linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+ background: var(--blue); 
   color:white;
   border-radius:16px;
   padding:32px 40px;
@@ -850,8 +850,8 @@ table tbody tr:hover {
             Equipment Maintenance Status
         </div>
         <div class="admin-area">
-            <div class="greeting">Hello, <?= $userName ?>!</div>
-            <div class="avatar"><?= strtoupper(substr($userName, 0, 1)) ?></div>
+          <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
+      <div class="avatar">AD</div>
         </div>
     </div>
 

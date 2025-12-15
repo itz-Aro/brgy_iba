@@ -55,6 +55,7 @@ $displayRole = htmlspecialchars($role);
 
 <link rel="stylesheet" href="/public/css/dashboard.css">
 <style>
+
 :root{
   --blue:#0d47a1;
   --light-gray:#efefef;
@@ -65,7 +66,7 @@ $displayRole = htmlspecialchars($role);
 /* Content beside sidebar */
 .content-wrap{ margin-left:250px; padding:22px; max-width:1500px; margin-top:0px; }
 
-/* Top header */
+
 .top-header{ background:var(--blue); color:white; border-radius:12px; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 14px rgba(0,0,0,0.12);}
 .top-header .title{ font-size:44px; font-weight:800; letter-spacing:-0.5px; }
 .admin-area{ display:flex; align-items:center; gap:18px; }
@@ -126,7 +127,7 @@ $displayRole = htmlspecialchars($role);
 }
 
 .page-btn:hover {
-    background-color: #0d47a1;
+    background-color: #41a10dff;
     color: white;
     transform: scale(1.05);
 }
