@@ -1,0 +1,324 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('../asset/login-bg.png') center center / cover no-repeat;
+    backdrop-filter: blur(10px);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box {
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-container {
+    background-color: white;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    width: 430px;
+    height: 550px;
+    padding: 28px 50px;
+}
+
+.login-logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+}
+
+.login-text {
+    width: 100%;
+}
+
+.login-text h1 {
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 27px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #0f62e8ff 0%, #083d92 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.msg {
+    font-size: 13px;
+    text-align: center;
+    margin: 8px 0;
+    padding: 6px;
+    border-radius: 8px;
+    min-height: 18px;
+    display: none; /* hide until there’s a message */
+}
+
+.msg:not(:empty) {
+    background: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+.login-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+}
+
+.input-field {
+    margin-bottom: 14px;
+    width: 100%;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    font-size: 14px;
+    background: #f8f9fa;
+    font-family: 'Poppins', sans-serif;
+    transition: 0.3s;
+}
+
+.input-field input:focus {
+    border-color: #083d92;
+    outline: none;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.input-field input::placeholder {
+    color: #999;
+}
+
+button[type="submit"], .btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2d7af5, #083d92);
+    color: white;
+    margin-top: 4px;
+}
+
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+.login-container p {
+    text-align: center;
+    /* margin-top: 5px; */
+    font-size: 15px;
+}
+
+.login-container a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+/* Logged In State */
+.logged-in-state {
+    border-radius: 20px;
+    padding: 50px;
+    background-color: white;
+    text-align: center;
+}
+
+.logged-in-state p {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.logged-in-state strong {
+    color: #024093;
+    font-size: 20px;
+}
+
+.btn-danger {
+    background: linear-gradient(to right, #ff416c 0%, #ff4b2b 100%);
+    color: white;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: modalSlideUp 0.4s ease-out;
+}
+
+@keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(30px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-content h2 {
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 28px; 
+    text-align: center;
+    background: linear-gradient(135deg, #2d7af5, #083d92 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 14px 18px;
+    margin: 12px 0;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.modal-content input:focus {
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.modal-content button {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2d7af5, #083d92);
+
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.btn-close {
+    background: #e0e0e0;
+    color: #666;
+}
+
+.btn-close:hover {
+    background: #d0d0d0;
+}
+
+.modal .msg {
+    min-height: 24px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal .msg:not(:empty) {
+    background: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+/* Success message styling */
+.modal .msg[style*="green"] {
+    background: #e8f5e9 !important;
+    color: #2e7d32 !important;
+    border: 1px solid #a5d6a7 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .login-container, .logged-in-state {
+        padding: 40px 30px;
+    }
+    
+    .modal-content {
+        padding: 30px 25px;
+    }
+    
+    .login-text h1 {
+        font-size: 28px;
+    }
+}

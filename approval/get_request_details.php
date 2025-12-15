@@ -83,7 +83,7 @@ function esc($v) {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: 'Poppins', sans-serif;
   color: #334155;
 }
 
@@ -93,7 +93,7 @@ function esc($v) {
   gap:18px;
   align-items:center;
   padding-bottom:16px;
-  border-bottom:2px solid #e5e9f2;
+  border-bottom:2px solid #083d97;
 }
 .avatar-photo-large {
   width:72px;
@@ -138,7 +138,7 @@ function esc($v) {
 /* Request items table */
 .request-items {
   background:#f9fbff;
-  padding:18px;
+  padding:18px 0;
   border-radius:10px;
 }
 .request-items h4 {
@@ -149,7 +149,7 @@ function esc($v) {
 }
 .request-items table { width:100%; border-collapse:collapse; margin-top:6px; }
 .request-items th {
-  background: #0d47a1;
+  background: #083d97;
   color:white;
   padding:10px;
   font-size:13px;

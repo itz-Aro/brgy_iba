@@ -61,232 +61,14 @@ $role = $_SESSION['user']['role'] ?? 'Admin';
 $displayRole = htmlspecialchars($role, ENT_QUOTES);
 ?>
 
+<link rel="stylesheet" href="../css/admin_dashboard.css">
 <link rel="stylesheet" href="/public/css/dashboard.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-<!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"> -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
 <style>
-/* ===== copied visual language from admin_returns.php ===== */
-* { box-sizing: border-box; }
-body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
 
-.content-wrap { 
-    margin-left: 250px; 
-    padding: 32px; 
-    max-width: 1600px;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Top header */
-.top-header { 
-    margin-bottom: 32px; 
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: white; 
-    border-radius: 20px; 
-    padding: 36px 40px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-.top-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-    border-radius: 50%;
-}
-.top-header .title { 
-    font-size: 2rem; 
-    font-weight: 800; 
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: relative;
-    z-index: 1;
-}
-.top-header .title i { font-size: 2.2rem; opacity: 0.95; }
-.admin-area { display:flex; align-items:center; gap:20px; position:relative; z-index:1; }
-.greeting { font-size: 1rem; font-weight: 600; opacity: 0.95; }
-.avatar { width: 60px; height: 60px; border-radius: 50%; background: white; color: #6366f1; display:flex; justify-content:center; align-items:center; font-weight:800; font-size:1.25rem; border:4px solid rgba(255,255,255,0.3); box-shadow:0 4px 12px rgba(0,0,0,0.15); }
-
-/* Stats */
-.stats-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
-}
-.stat-card {
-    background: white;
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 2px solid #f1f5f9;
-    transition: all 0.3s;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-.stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.12); border-color:#6366f1; }
-.stat-left { display:flex; flex-direction:column; gap:6px; }
-.stat-left h4 { margin:0; font-size:14px; font-weight:700; color:#334155; }
-.stat-number { font-size:34px; font-weight:800; color:#0f172a; }
-
-/* Activity + layout */
-.main-grid { display:grid; grid-template-columns: 1fr 380px; gap:18px; align-items:start; }
-.activity-box { background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08); display:flex; flex-direction:column; }
-.activity-header { background: linear-gradient(135deg,#6366f1,#8b5cf6); color:white; padding:16px; font-weight:800; font-size:18px; border-radius:12px 12px 0 0; }
-.activity-list { list-style:none; padding:0; margin:0; height:360px; overflow-y:auto; }
-.activity-item { display:flex; gap:12px; align-items:center; padding:14px 18px; border-bottom:1px solid #f1f3f6; cursor:default; }
-.activity-item.clickable { cursor:pointer; }
-.activity-avatar { width:44px; height:44px; border-radius:8px; background:#f5f7fb; display:flex; justify-content:center; align-items:center; font-weight:700; color:#0d47a1; }
-.activity-text { flex:1; font-weight:600; }
-.activity-meta { text-align:right; min-width:140px; font-size:13px; color:#6b7787; }
-.label-success{ color:#059669; font-weight:700; }
-.label-danger{ color:#dc2626; font-weight:700; }
-.label-pending{ color:#d97706; font-weight:700; }
-
-/* Graph Card */
-.graph-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  overflow: hidden;
-  display:flex;
-  flex-direction:column;
-  height:468px;
-}
-.graph-header {
-  background: linear-gradient(135deg,#6366f1,#8b5cf6);
-  color:white;
-  padding:16px 18px;
-  font-weight:800;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.graph-body { padding:18px; position:relative; display:flex; flex-direction:column; justify-content:center; gap:12px; }
-
-/* Modal (reuse admin_returns style) */
-.modal-overlay {
-    display:none;
-    position:fixed;
-    top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.7);
-    justify-content:center; align-items:center; z-index:9999;
-}
-.modal-box {
-    background:white;
-    width:100%;
-    max-width:820px;
-    padding:0;
-    border-radius:14px;
-    box-shadow:0 5px 30px rgba(0,0,0,0.30);
-    animation: popIn 0.25s ease-out;
-    margin:auto;
-    max-height:90vh;
-    overflow-y:auto;
-}
-@keyframes popIn { from { transform: scale(0.95); opacity:0 } to { transform: scale(1); opacity:1 } }
-.modal-header {
-  background: linear-gradient(135deg,#6366f1,#8b5cf6);
-  color:white;
-  padding:20px 22px;
-  border-radius:14px 14px 0 0;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.modal-header h2 { margin:0; font-size:20px; font-weight:800; }
-.close-modal { background:none; border:none; color:white; font-size:22px; cursor:pointer; padding:0 6px; border-radius:6px; }
-
-/* small responsive */
-@media (max-width: 1024px) {
-  .content-wrap { margin-left:0; padding:20px; }
-  .main-grid { grid-template-columns: 1fr; }
-  .activity-meta { min-width:90px; }
-}
-/* Pagination buttons */
-.activity-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 0;
-  background: #f5f7fb;
-  border-top: 1px solid #e0e0e0;
-  border-radius: 0 0 12px 12px;
-}
-
-.page-btn {
-  background: white;
-  color: var(--blue);
-  border: 1px solid #cfe1ff;
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: all 0.2s ease;
-}
-
-.page-btn:hover:not(.active):not(:disabled) {
-  background: #e3f2fd;
-  border-color: #90caf9;
-  color: #0d47a1;
-}
-
-.page-btn.active {
-  background: linear-gradient(135deg, #0d47a1, #1e73ff);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 12px rgba(13,71,161,0.25);
-}
-
-.page-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-
-
-/*CHARTTTYERN*/
-
-.view-large {
-  display: inline-block;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom:-20px;
-  font-weight: 700;
-  font-size: 13px;
-  color: #0d47a1;
-  text-decoration: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid #cfe1ff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: all 0.25s ease;
-}
-
-.view-large:hover {
-  background: linear-gradient(135deg, #0d47a1, #1e73ff);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(13,71,161,0.25);
-  text-decoration: none;
-}
 
 
 </style>
@@ -311,7 +93,7 @@ body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
         <h4>Pending Requests</h4>
         <div class="stat-number"><?= $pendingRequests ?></div>
       </div>
-      <div style="font-size:28px;color:#6366f1;"><i class="fa-solid fa-clock"></i></div>
+      <div><i class="fa-solid fa-clock"></i></div>
     </div>
 
     <div class="stat-card">
@@ -319,7 +101,7 @@ body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
         <h4>Ongoing Borrowings</h4>
         <div class="stat-number"><?= $ongoingBorrowings ?></div>
       </div>
-      <div style="font-size:28px;color:#6366f1;"><i class="fas fa-people-carry"></i></div>
+      <div><i class="fas fa-people-carry"></i></div>
     </div>
 
     <div class="stat-card">
@@ -327,7 +109,7 @@ body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
         <h4>Items Due for Return</h4>
         <div class="stat-number"><?= $itemsDue ?></div>
       </div>
-      <div style="font-size:28px;color:#6366f1;"><i class="fa-solid fa-calendar-days"></i></div>
+      <div><i class="fa-solid fa-calendar-days"></i></div>
     </div>
 
     <div class="stat-card">
@@ -335,12 +117,11 @@ body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
         <h4>Total Damage Reports</h4>
         <div class="stat-number"><?= $damagedEquipment ?></div>
       </div>
-      <div style="font-size:28px;color:#6366f1;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div><i class="fa-solid fa-triangle-exclamation"></i></div>
     </div>
   </div>
 
   <div class="main-grid">
-
     <!-- Activity Overview -->
     <div class="left-column">
       <div class="activity-box" role="region" aria-labelledby="activityTitle">
@@ -399,9 +180,9 @@ body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
         <div class="graph-header">
           <div>
             <div style="font-size:18px;">Most Used Equipment</div>
-            <small>Based on total borrowed quantity</small>
+            <small>(Based on total borrowed quantity)</small>
           </div>
-          <i class="fa-solid fa-chart-bar" style="font-size:18px;opacity:0.9;"></i>
+          <i class="fa-solid fa-chart-bar" style="font-size:18px;"></i>
         </div>
 
         <div class="graph-body">
@@ -443,6 +224,7 @@ if (!topLabels.length) {
       <div style="font-size:13px;">Equipment usage will appear here once items are borrowed.</div>
     </div>`;
 } else {
+  Chart.defaults.font.family = 'Poppins, sans-serif';
   new Chart(ctx, {
     type: 'bar',
     data: {
@@ -450,7 +232,7 @@ if (!topLabels.length) {
       datasets: [{
         label: 'Total Borrowed',
         data: topData,
-        backgroundColor: '#1e73ff',
+        backgroundColor: '#083d97',
         borderRadius: 8,
         barThickness: 28
       }]

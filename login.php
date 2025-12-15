@@ -13,349 +13,23 @@ if (isset($_SESSION['user'])) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Barangay Login Portal</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/login.css">
 
 <!-- EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
-  (function() { emailjs.init("PLC-sqoygo8kqEgvG"); })();
+(function() { emailjs.init("PLC-sqoygo8kqEgvG"); })();
 </script>
-
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #b9c4f8ff 0%, #083d92 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.login-box {
-    background: rgba(143, 35, 35, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-
-   /* ✅ SAME AS WIDTH */
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    animation: slideUp 0.5s ease-out;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.login-container {
-    width: 380px;
-    height: 460px;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.login-logo {
-    text-align: center;
-    margin-bottom: -10px;
-}
-
-.login-logo img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-}
-
-.login-text h1 {
-    text-align: center;
-    font-size: 25px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    background: linear-gradient(135deg, #0f62e8ff 0%, #083d92 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.msg {
-    font-size: 12px;
-    text-align: center;
-    margin: 8px 0;
-    padding: 6px;
-    border-radius: 8px;
-    min-height: 18px;
-}
-
-.msg:not(:empty) {
-    background: #fee;
-    color: #c33;
-    border: 1px solid #fcc;
-}
-
-.login-input {
-    /* margin:-10px; */
-}
-
-.input-field {
-    margin-bottom: 14px;
-    width: 100%;
-}
-
-.input-field input {
-    
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 2px solid #e0e0e0;
-    font-size: 14px;
-    background: #f8f9fa;
-}
-
-.input-field input:focus {
-    outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-}
-
-.input-field input::placeholder {
-    color: #999;
-}
-
-button[type="submit"], .btn {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-}
-
-button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #667eea 0%, #a09afdff 100%);
-    color: white;
-    margin-top: 4px;
-}
-
-
-button[type="submit"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-}
-
-button[type="submit"]:active {
-    transform: translateY(0);
-}
-
-.login-container p {
-    text-align: center;
-    margin-top: -10px;
-    font-size: 15px;
-}
-
-
-.login-container a {
-    color: #667eea;
-    text-decoration: none;
-}
-
-.login-container a {
-    color: #667eea;
-    text-decoration: none;
-}
-
-/* Logged In State */
-.logged-in-state {
-    text-align: center;
-}
-
-.logged-in-state p {
-    font-size: 16px;
-    margin-bottom: 15px;
-}
-
-.logged-in-state strong {
-    color: #667eea;
-    font-size: 20px;
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-}
-
-.btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
-}
-
-/* Modal Styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal-content {
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 420px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    animation: modalSlideUp 0.4s ease-out;
-}
-
-@keyframes modalSlideUp {
-    from { opacity: 0; transform: translateY(30px) scale(0.9); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-content h2 {
-    margin-bottom: 25px;
-    color: #333;
-    font-size: 28px;
-    text-align: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.modal-content input {
-    width: 100%;
-    padding: 14px 18px;
-    margin: 12px 0;
-    border-radius: 10px;
-    border: 2px solid #e0e0e0;
-    font-size: 15px;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
-}
-
-.modal-content input:focus {
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    outline: none;
-}
-
-.modal-content button {
-    width: 100%;
-    padding: 14px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #ced6f8ff 0%, #2b05d4ff 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-}
-
-.btn-close {
-    background: #e0e0e0;
-    color: #666;
-}
-
-.btn-close:hover {
-    background: #d0d0d0;
-}
-
-.modal .msg {
-    min-height: 24px;
-    font-size: 14px;
-    margin-bottom: 15px;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.modal .msg:not(:empty) {
-    background: #fee;
-    color: #c33;
-    border: 1px solid #fcc;
-}
-
-/* Success message styling */
-.modal .msg[style*="green"] {
-    background: #e8f5e9 !important;
-    color: #2e7d32 !important;
-    border: 1px solid #a5d6a7 !important;
-}
-
-/* Responsive Design */
-@media (max-width: 480px) {
-    .login-container, .logged-in-state {
-        padding: 40px 30px;
-    }
-    
-    .modal-content {
-        padding: 30px 25px;
-    }
-    
-    .login-text h1 {
-        font-size: 28px;
-    }
-}
-</style>
 </head>
 <body>
 
 <div class="login-box">
-<?php if ($alreadyLoggedIn): ?>
-    <div class="logged-in-state">
-        <p>You are already logged in as <strong><?php echo ucfirst($role); ?></strong></p>
-        <a href="./logout.php" class="btn btn-danger">Logout</a>
-    </div>
-<?php else: ?>
+    <?php if ($alreadyLoggedIn): ?>
+        <div class="logged-in-state">
+            <p>You are already logged in as <strong><?php echo ucfirst($role); ?></strong></p>
+            <a href="./logout.php" class="btn btn-danger">Logout</a>
+        </div>
+    <?php else: ?>
     <form id="loginForm">
         <div class="login-container">
             <div class="login-logo"><img src="asset/logo.png" alt="Barangay Logo"></div>
@@ -378,7 +52,7 @@ button[type="submit"]:active {
             </p>
         </div>
     </form>
-<?php endif; ?>
+    <?php endif; ?>
 </div>
 
 <!-- Multi-Step Reset Modal -->
@@ -669,6 +343,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     })();
 });
+
 </script>
 </body>
 </html>

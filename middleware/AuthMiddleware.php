@@ -22,7 +22,7 @@ class AuthMiddleware {
                         align-items: center;
                         height: 100vh;
                         margin: 0;
-                        font-family: Arial, sans-serif;
+                        font-family: Poppins, sans-serif;
                         background-color: #f8f9fa;
                     }
                     .container {
@@ -37,9 +37,10 @@ class AuthMiddleware {
                         margin-bottom: 20px;
                     }
                     button {
+                        font-family: Poppins, sans-serif;
                         padding: 12px 24px;
                         font-size: 16px;
-                        background-color: #007bff;
+                        background: linear-gradient(135deg, #2d7af5, #083d92);
                         color: #fff;
                         border: none;
                         border-radius: 8px;
