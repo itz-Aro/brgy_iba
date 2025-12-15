@@ -206,7 +206,8 @@ $userName = htmlspecialchars($_SESSION['user']['name'] ?? 'User');
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
   background-color: var(--light-gray);
   color: #2c3e50;
 }
