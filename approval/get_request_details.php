@@ -252,8 +252,8 @@ function esc($v) {
             <span><?= esc($request['expected_return_date']) ?: '-' ?></span>
         </div>
         <div>
-            <strong>Borrower Contact</strong>
-            <span><?= esc($request['borrower_contact']) ?: '-' ?></span>
+            <strong>Borrower Email</strong>
+            <span><?= esc($request['borrower_email']) ?: '-' ?></span>
         </div>
         <div>
             <strong>Borrower Address</strong>
