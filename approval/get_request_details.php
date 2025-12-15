@@ -12,41 +12,6 @@ $conn = $db->getConnection();
 $id = intval($_GET['id']);
 
 // Fetch request details
-$stmt = $conn->prepare("SELECT r.*, u.fullname AS creator_name FROM requests r JOIN users u ON r.created_by = u.id WHERE r.id = :id");
-$stmt->bindParam(':id', $id);
-$stmt->execute();
-$request = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$request) {
-    echo '<p style="text-align: center; color: #d32f2f;">Request not found.</p>';
-    exit;
-}
-
-// Fetch request items
-$stmtItems = $conn->prepare("
-    SELECT ri.*, e.name AS equipment_name
-    FROM request_items ri
-    JOIN equipment e ON ri.equipment_id = e.id
-    WHERE ri.request_id = ?
-");
-$stmtItems->execute([$request['id']]);
-$requestItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<?php
-
-require_once __DIR__ . '/../config/Database.php';
-
-if (!isset($_GET['id'])) {
-    echo '<p style="text-align: center; color: #d32f2f;">Request ID missing.</p>';
-    exit;
-}
-
-$db = new Database();
-$conn = $db->getConnection();
-$id = intval($_GET['id']);
-
-// Fetch request details
 $stmt = $conn->prepare("SELECT r.*, u.fullname AS creator_name 
                         FROM requests r 
                         JOIN users u ON r.created_by = u.id 
@@ -70,13 +35,11 @@ $stmtItems = $conn->prepare("
 $stmtItems->execute([$request['id']]);
 $requestItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-// Helper to output safe field
 function esc($v) {
     return htmlspecialchars($v ?? '', ENT_QUOTES);
 }
 ?>
 
-<!-- Embedded style matches the Requests / Returns UI -->
 <style>
 /* Card & modal content styling (keeps consistent with main UI) */
 .request-detail-card {
@@ -138,7 +101,7 @@ function esc($v) {
 /* Request items table */
 .request-items {
   background:#f9fbff;
-  padding:18px 0;
+  padding:18px;
   border-radius:10px;
 }
 .request-items h4 {
@@ -166,6 +129,14 @@ function esc($v) {
   border-bottom:1px solid #e5e9f2;
 }
 .request-items tr:last-child td { border-bottom:none; }
+
+/* Checkbox styling */
+.item-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #083d97;
+}
 
 /* Remarks */
 .remarks-section {
@@ -207,16 +178,50 @@ function esc($v) {
   cursor:pointer;
   transition:0.2s;
   font-size:14px;
+  flex: 1;
 }
 .btn-action:hover { transform:translateY(-2px); opacity:0.95; }
 .btn-approve { background-color:#1b8b1b; }
-.decline-btn { background-color:#d32f2f; padding:12px 20px; font-weight:600; border-radius:10px; border:none; color:white; cursor:pointer; transition:0.2s; font-size:14px; }
+.decline-btn { background-color:#d32f2f; padding:12px 20px; font-weight:600; border-radius:10px; border:none; color:white; cursor:pointer; transition:0.2s; font-size:14px; flex: 1; }
+.decline-btn:hover { transform:translateY(-2px); opacity:0.95; }
+
+/* Unavailable items notice */
+.unavailable-notice {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-top: 12px;
+  color: #856404;
+  font-size: 13px;
+}
+
+/* Instruction box */
+.instruction-box {
+  font-size: 13px;
+  color: #657085;
+  margin: 0 0 12px 0;
+  padding: 10px;
+  background: #e3f2fd;
+  border-left: 4px solid #2196F3;
+  border-radius: 4px;
+}
+
+.instruction-box strong {
+  color: #0d47a1;
+}
+
+.instruction-box strong.unavailable {
+  color: #d32f2f;
+}
 
 /* Small responsive tweaks inside modal content */
 @media (max-width:640px) {
   .grid-info { grid-template-columns: 1fr; }
   .card-header { gap:12px; }
   .avatar-photo-large { width:64px; height:64px; }
+  .modal-actions { flex-direction: column; }
+  .btn-action, .decline-btn { width: 100%; }
 }
 </style>
 
@@ -256,7 +261,47 @@ function esc($v) {
         </div>
     </div>
 
-    <!-- Request Items -->
+    <!-- Request Items with Selection (Only for Pending) -->
+    <?php if ($request['status'] === 'Pending'): ?>
+    <div class="request-items" aria-live="polite">
+        <h4>Requested Items (Mark unavailable items)</h4>
+        <p class="instruction-box">
+            <strong>☐ Unchecked = APPROVED</strong> | <strong class="unavailable">✓ Checked = NOT AVAILABLE</strong>
+        </p>
+        <?php if (count($requestItems) > 0): ?>
+            <form id="itemSelectionForm">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Unavailable</th>
+                            <th>Equipment</th>
+                            <th>Quantity</th>
+                            <th>Condition</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($requestItems as $item): ?>
+                            <tr>
+                                <td style="text-align: center;">
+                                    <input type="checkbox" class="item-checkbox" name="unavailable_items" value="<?= esc($item['id']) ?>">
+                                </td>
+                                <td><?= esc($item['equipment_name']) ?></td>
+                                <td><?= esc($item['quantity']) ?></td>
+                                <td><?= esc($item['unit_condition']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <div class="unavailable-notice" id="unavailableNotice" style="display:none;">
+                    <strong>Items marked as unavailable:</strong> <span id="unavailableList"></span>
+                </div>
+            </form>
+        <?php else: ?>
+            <p style="color:#657085; font-size:14px;">No items requested.</p>
+        <?php endif; ?>
+    </div>
+    <?php else: ?>
+    <!-- Request Items (Read-only for non-pending) -->
     <div class="request-items" aria-live="polite">
         <h4>Requested Items</h4>
         <?php if (count($requestItems) > 0): ?>
@@ -282,6 +327,7 @@ function esc($v) {
             <p style="color:#657085; font-size:14px;">No items requested.</p>
         <?php endif; ?>
     </div>
+    <?php endif; ?>
 
     <!-- Remarks -->
     <div class="remarks-section">
@@ -300,21 +346,45 @@ function esc($v) {
     <!-- Action Buttons (only for Pending) -->
     <?php if ($request['status'] === 'Pending'): ?>
         <div class="modal-actions">
-            <form action="request_action.php" method="post" style="margin: 0;">
+            <form id="approveForm" action="request_action.php" method="post" style="margin: 0; flex: 1;">
                 <input type="hidden" name="id" value="<?= esc($request['id']) ?>">
                 <input type="hidden" name="action" value="approve">
-                <button type="submit" class="btn-action btn-approve">Approve</button>
+                <input type="hidden" name="unavailable_items" id="unavailableItemsInput" value="">
+                <button type="button" class="btn-action btn-approve" onclick="submitApproval()">
+                    Approve
+                </button>
             </form>
 
-            <!-- Note: openNotesModal() is defined in parent page -->
-            <button type="button" class="decline-btn" onclick="openNotesModal(<?= esc($request['id']) ?>)">Not Available</button>
+            <button type="button" class="decline-btn" onclick="openNotesModal(<?= esc($request['id']) ?>)">
+                Decline All
+            </button>
         </div>
     <?php else: ?>
         <div class="modal-actions">
-            <span class="status-badge" style="background: <?= $request['status']=='Approved' ? '#1b8b1b' : '#d32f2f' ?>; padding: 8px 16px; font-size: 14px; color: #fff;">
+            <span class="status-badge" style="background: <?= $request['status']=='Approved' ? '#1b8b1b' : '#d32f2f' ?>; padding: 8px 16px; font-size: 14px; color: #fff; border-radius: 6px; text-align: center; width: 100%;">
                 Status: <?= esc($request['status']) ?>
             </span>
         </div>
     <?php endif; ?>
 
 </div>
+
+<script>
+// Update unavailable items notice
+document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const checkedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+            .map(cb => cb.closest('tr').querySelector('td:nth-child(2)').textContent.trim());
+
+        const notice = document.getElementById('unavailableNotice');
+        const list = document.getElementById('unavailableList');
+
+        if (checkedItems.length > 0) {
+            list.textContent = checkedItems.join(', ');
+            notice.style.display = 'block';
+        } else {
+            notice.style.display = 'none';
+        }
+    });
+});
+</script>

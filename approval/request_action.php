@@ -13,30 +13,39 @@ $id = intval($_POST['id']);
 $action = $_POST['action'];
 $user_id = $_SESSION['user']['id'] ?? 0;
 
-// Validate action
 if (!in_array($action, ['approve', 'decline'])) {
     die("Invalid action.");
 }
 
-/* ============================
-   ✅ APPROVE REQUEST
-=============================== */
+// FETCH request details for both approve and decline
+$stmt = $conn->prepare("
+    SELECT id, request_no, borrower_name, borrower_contact, borrower_email, borrower_address, expected_return_date
+    FROM requests
+    WHERE id = :id
+");
+$stmt->execute([':id' => $id]);
+$request = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$request) {
+    die("Request not found.");
+}
+
+// Check if email exists and is valid
+$hasEmail = !empty($request['borrower_email']) && filter_var($request['borrower_email'], FILTER_VALIDATE_EMAIL);
+if (!$hasEmail) {
+    $_SESSION['email_warning'] = "No valid email address found for borrower: " . htmlspecialchars($request['borrower_name']);
+}
+
+/* ============================ APPROVE ============================ */
 if ($action === "approve") {
 
-    // 1. GET REQUEST DETAILS
-    $stmt = $conn->prepare("
-        SELECT borrower_name, borrower_contact, borrower_address, expected_return_date 
-        FROM requests 
-        WHERE id = :id
-    ");
-    $stmt->execute([':id' => $id]);
-    $request = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$request) {
-        die("Request not found.");
+    $unavailableItems = [];
+    if (!empty($_POST['unavailable_items'])) {
+        $decoded = json_decode($_POST['unavailable_items'], true);
+        $unavailableItems = is_array($decoded) ? array_map('intval', $decoded) : [];
     }
 
-    // 2. UPDATE REQUEST STATUS
+    // Update request status
     $stmt = $conn->prepare("
         UPDATE requests 
         SET status = 'Approved',
@@ -49,10 +58,10 @@ if ($action === "approve") {
         ':id' => $id
     ]);
 
-    // 3. GENERATE BORROWING NUMBER
+    // Generate borrowing number
     $borrowing_no = "BRW-" . time();
 
-    // 4. INSERT INTO BORROWINGS TABLE
+    // Insert into borrowings
     $stmt = $conn->prepare("
         INSERT INTO borrowings 
         (borrowing_no, request_id, borrower_name, borrower_contact, borrower_address, approved_by, expected_return_date)
@@ -69,44 +78,81 @@ if ($action === "approve") {
         ':expected_return_date' => $request['expected_return_date']
     ]);
 
-    // 5. GET NEW BORROWING ID
     $borrowing_id = $conn->lastInsertId();
 
-    // 6. GET REQUEST ITEMS
-    $stmt = $conn->prepare("
-        SELECT equipment_id, quantity, unit_condition 
+    // Insert borrowing items
+    $stmtItems = $conn->prepare("
+        SELECT id, equipment_id, quantity, unit_condition 
         FROM request_items 
         WHERE request_id = :request_id
     ");
-    $stmt->execute([':request_id' => $id]);
-    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmtItems->execute([':request_id' => $id]);
+    $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-    // 7. INSERT INTO BORROWING ITEMS
-    $stmt = $conn->prepare("
+    $stmtInsert = $conn->prepare("
         INSERT INTO borrowing_items 
         (borrowing_id, equipment_id, quantity, condition_out)
-        VALUES
-        (:borrowing_id, :equipment_id, :quantity, :condition_out)
+        VALUES (:borrowing_id, :equipment_id, :quantity, :condition_out)
     ");
 
     foreach ($items as $item) {
-        $stmt->execute([
+        $itemId = intval($item['id']);
+        if (in_array($itemId, $unavailableItems)) continue;
+
+        $stmtInsert->execute([
             ':borrowing_id' => $borrowing_id,
             ':equipment_id' => $item['equipment_id'],
             ':quantity' => $item['quantity'],
             ':condition_out' => $item['unit_condition']
         ]);
     }
+
+    if (!empty($unavailableItems)) {
+        $notesUnavailable = "Partial approval: " . count($unavailableItems) . " item(s) unavailable";
+        $stmt = $conn->prepare("UPDATE requests SET notes_declined = :notes WHERE id = :id");
+        $stmt->execute([':notes'=>$notesUnavailable, ':id'=>$id]);
+    }
+
+    // Build approved & unavailable item names
+    $approvedNames = [];
+    $unavailableNames = [];
+
+    $stmtNames = $conn->prepare("
+        SELECT ri.id, e.name 
+        FROM request_items ri
+        JOIN equipment e ON ri.equipment_id = e.id
+        WHERE ri.request_id = :rid
+    ");
+    $stmtNames->execute([':rid' => $id]);
+    $allItems = $stmtNames->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($allItems as $i) {
+        $itemId = intval($i['id']);
+        if (in_array($itemId, $unavailableItems)) {
+            $unavailableNames[] = $i['name'];
+        } else {
+            $approvedNames[] = $i['name'];
+        }
+    }
+
+    $_SESSION['email_payload'] = [
+        'type' => 'approve',
+        'borrower_name' => $request['borrower_name'],
+        'request_no' => $request['request_no'],
+        'approved_items' => !empty($approvedNames) ? implode(', ', $approvedNames) : 'None',
+        'unavailable_items' => !empty($unavailableNames) ? implode(', ', $unavailableNames) : 'None',
+        'expected_return' => $request['expected_return_date'],
+        'email' => $request['borrower_email'] ?? '',
+        'has_email' => $hasEmail
+    ];
+
 }
 
-
-/* ============================
-   ✅ DECLINE REQUEST
-=============================== */
+/* ============================ DECLINE ============================ */
 elseif ($action === "decline") {
 
     if (!isset($_POST['notes']) || trim($_POST['notes']) === "") {
-        die("Notes are required when declining.");
+        die("Notes required when declining.");
     }
 
     $notes = trim($_POST['notes']);
@@ -124,8 +170,19 @@ elseif ($action === "decline") {
         ':approver_id' => $user_id,
         ':id' => $id
     ]);
+
+    $_SESSION['email_payload'] = [
+        'type' => 'decline',
+        'borrower_name' => $request['borrower_name'],
+        'request_no' => $request['request_no'],
+        'reason' => $notes,
+        'email' => !empty($request['borrower_email']) ? $request['borrower_email'] : $request['borrower_contact'],
+        'has_email' => $hasEmail
+    ];
 }
 
-// ✅ REDIRECT BACK
+// Give EmailJS time to send before redirecting
+sleep(2);
+
 header("Location: requests_pending.php");
 exit;

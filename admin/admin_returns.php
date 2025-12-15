@@ -8,7 +8,7 @@ AuthMiddleware::protect(['admin','officials']);
 
 $db = new Database();
 $conn = $db->getConnection();
-$baseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/brgy_iba/uploads/returns/';
+$baseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . 'brgy_iba/uploads/returns/';
 
 if (isset($_POST['confirm_return'])) {
 
@@ -77,31 +77,29 @@ if (isset($_POST['confirm_return'])) {
                 status
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
         ");
-       $status = ($condition === 'Damaged') ? 'Damaged' : 'Returned';
+        $status = ($condition === 'Damaged') ? 'Damaged' : 'Returned';
         $insertReturn->execute([
-        $item_id,
-        $borrow['borrowing_id'],
-        $borrow['borrowing_no'],
-        $borrow['borrower_name'],
-        $equipment_id,
-        $borrow['equipment_name'],
-        $borrow['quantity'],
-        $borrow['condition_out'] ?? 'Good',
-        $condition,
-        $damageRemarks,   // <-- correctly set
-        $returnPhotoId,   // <-- photo ID
-        $status
-    ]);
+            $item_id,
+            $borrow['borrowing_id'],
+            $borrow['borrowing_no'],
+            $borrow['borrower_name'],
+            $equipment_id,
+            $borrow['equipment_name'],
+            $borrow['quantity'],
+            $borrow['condition_out'] ?? 'Good',
+            $condition,
+            $damageRemarks ?: null,
+            $returnPhotoId,
+            $status
+        ]);
 
-
-
-        // Update borrowing item
+        // Update borrowing item status
         $updBorrowItem = $conn->prepare("
             UPDATE borrowing_items
-            SET status = 'Returned', condition_in = ?
+            SET status = ?, condition_in = ?
             WHERE id = ?
         ");
-        $updBorrowItem->execute([$condition, $item_id]);
+        $updBorrowItem->execute([$status, $condition, $item_id]);
 
         // Update equipment quantity
         $updEquip = $conn->prepare("
@@ -111,10 +109,10 @@ if (isset($_POST['confirm_return'])) {
         ");
         $updEquip->execute([$borrow['quantity'], $equipment_id]);
 
-        // Check if all items returned
+        // Check if all items returned for this borrowing
         $checkAll = $conn->prepare("
             SELECT COUNT(*) as total,
-                   SUM(CASE WHEN status = 'Returned' THEN 1 ELSE 0 END) as returned
+                   SUM(CASE WHEN status IN ('Returned','Damaged') THEN 1 ELSE 0 END) as returned
             FROM borrowing_items
             WHERE borrowing_id = ?
         ");
@@ -131,6 +129,7 @@ if (isset($_POST['confirm_return'])) {
         }
 
         $conn->commit();
+
         $_SESSION['return_success'] = [
             'borrowing_no' => $borrow['borrowing_no'],
             'equipment_name' => $borrow['equipment_name'],
@@ -138,6 +137,7 @@ if (isset($_POST['confirm_return'])) {
             'quantity' => $borrow['quantity'],
             'condition' => $condition
         ];
+
         header("Location: admin_returns.php");
         exit;
 
@@ -149,6 +149,7 @@ if (isset($_POST['confirm_return'])) {
     }
 }
 
+
 // ==========================
 // FETCH ITEMS DUE
 // ==========================
@@ -159,18 +160,18 @@ $dueItems = $conn->query("
     FROM borrowing_items bi
     JOIN borrowings b ON bi.borrowing_id = b.id
     JOIN equipment e ON bi.equipment_id = e.id
-    WHERE b.status = 'Active'
+    WHERE b.status = 'Active' 
+      
     ORDER BY b.expected_return_date ASC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// FETCH RETURNED ITEMS
+// FETCH RETURNED ITEMS (excluding damaged)
 $returnedItems = $conn->query("
     SELECT ri.id AS item_id, ri.quantity, ri.condition_out, ri.condition_in,
-           b.borrowing_no, b.borrower_name, ri.return_date AS actual_return_date,
-           e.id AS equipment_id, e.name AS equipment_name
+           ri.borrowing_no, ri.borrower_name, ri.return_date AS actual_return_date,
+           ri.equipment_id, ri.equipment_name
     FROM returned_items ri
-    JOIN borrowings b ON ri.borrowing_id = b.id
-    JOIN equipment e ON ri.equipment_id = e.id
+    WHERE ri.status = 'Returned' AND ri.condition_in != 'Damaged'
     ORDER BY ri.return_date DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -183,7 +184,7 @@ $damagedItems = $conn->query("
            rp.filename AS return_photo
     FROM returned_items ri
     LEFT JOIN return_photos rp ON rp.id = ri.return_photo_id
-    WHERE ri.condition_in = 'Damaged'
+    WHERE ri.status = 'Damaged' OR ri.condition_in = 'Damaged'
     ORDER BY ri.return_date DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -194,6 +195,12 @@ $displayRole = htmlspecialchars($role);
 $returnSuccess = $_SESSION['return_success'] ?? null;
 if ($returnSuccess) {
     unset($_SESSION['return_success']);
+}
+
+// Get error if exists
+$errorMessage = $_SESSION['error'] ?? null;
+if ($errorMessage) {
+    unset($_SESSION['error']);
 }
 ?>
 
@@ -214,6 +221,25 @@ if ($returnSuccess) {
         <div class="avatar">AD</div>
     </div>
 </div>
+
+<!-- Error Toast -->
+<?php if ($errorMessage): ?>
+<div id="errorToast" style="position:fixed; top:80px; right:20px; background:#dc2626; color:white; padding:16px 24px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:99999; display:flex; align-items:center; gap:12px; animation: slideIn 0.3s ease;">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span><?= htmlspecialchars($errorMessage) ?></span>
+    <button onclick="this.parentElement.remove()" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer; margin-left:8px;">&times;</button>
+</div>
+<script>
+setTimeout(() => {
+    const toast = document.getElementById('errorToast');
+    if (toast) {
+        toast.style.transition = 'opacity 0.3s ease';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }
+}, 5000);
+</script>
+<?php endif; ?>
 
 <!-- Statistics Cards -->
 <div class="stats-container">
@@ -278,7 +304,7 @@ if ($returnSuccess) {
                     $today = new DateTime();
                     $isOverdue = $expectedDate < $today;
                 ?>
-                    <tr>
+                    <tr data-item-id="<?= $r['item_id'] ?>">
                         <td><strong><?= htmlspecialchars($r['borrowing_no']) ?></strong></td>
                         <td><?= htmlspecialchars($r['borrower_name']) ?></td>
                         <td><?= htmlspecialchars($r['equipment_name']) ?></td>
@@ -312,8 +338,9 @@ if ($returnSuccess) {
                                     <option value="Damaged">✗ Damaged</option>
                                 </select>
 
-                                <div class="file-input-wrapper">
-                                    <input type="file" name="return_photo" accept="image/*">
+                                <div class="file-input-wrapper" style="margin-top:8px;">
+                                    <input type="file" name="return_photo" accept="image/*" style="font-size:0.85rem;">
+                                    <small style="color:#64748b; display:block; margin-top:4px;">Required for damaged items</small>
                                 </div>
 
                                 <button type="submit" name="confirm_return" class="confirm-btn">
@@ -372,8 +399,8 @@ if ($returnSuccess) {
                             </span>
                         </td>
                         <td>
-                            <span class="<?= $r['condition_in'] === 'Damaged' ? 'badge-damage' : ($r['condition_in'] === 'Fair' ? 'badge-warning' : 'badge-good') ?>">
-                                <i class="fa-solid fa-<?= $r['condition_in'] === 'Damaged' ? 'triangle-exclamation' : ($r['condition_in'] === 'Fair' ? 'circle-exclamation' : 'circle-check') ?>"></i>
+                            <span class="<?= $r['condition_in'] === 'Fair' ? 'badge-warning' : 'badge-good' ?>">
+                                <i class="fa-solid fa-<?= $r['condition_in'] === 'Fair' ? 'circle-exclamation' : 'circle-check' ?>"></i>
                                 <?= htmlspecialchars($r['condition_in']) ?>
                             </span>
                         </td>
@@ -526,20 +553,20 @@ if ($returnSuccess) {
 
 <!-- Damaged Remarks Modal -->
 <div id="damageRemarksModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; justify-content:center; align-items:center;">
-    <div style="background:white; padding:24px; border-radius:16px; max-width:420px; width:100%;">
-        <h3 style="color:#dc2626;">
+    <div style="background:white; padding:24px; border-radius:16px; max-width:420px; width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+        <h3 style="color:#dc2626; margin-bottom:8px;">
             <i class="fa-solid fa-triangle-exclamation"></i> Damaged Item Description
         </h3>
         <p style="font-size:0.9rem; color:#64748b; margin-bottom:12px;">
-            Please provide a description for the damage:
+            Please provide a detailed description of the damage:
         </p>
-        <textarea id="damageRemarksText" required style="width:100%; height:100px; padding:10px; border-radius:8px; border:2px solid #e2e8f0; resize:none;"></textarea>
+        <textarea id="damageRemarksText" required style="width:100%; height:100px; padding:10px; border-radius:8px; border:2px solid #e2e8f0; resize:none; font-family:inherit;" placeholder="Describe the damage..."></textarea>
         <div style="display:flex; gap:10px; margin-top:16px;">
-            <button type="button" onclick="closeDamageModal()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#e5e7eb;">
+            <button type="button" onclick="closeDamageModal()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#e5e7eb; cursor:pointer; font-weight:500;">
                 Cancel
             </button>
-            <button type="button" onclick="saveDamageAndSubmit()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#dc2626; color:white;">
-                Save Damage
+            <button type="button" onclick="saveDamageAndSubmit()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#dc2626; color:white; cursor:pointer; font-weight:500;">
+                <i class="fa-solid fa-check"></i> Confirm
             </button>
         </div>
     </div>
@@ -547,19 +574,18 @@ if ($returnSuccess) {
 
 <style>
 @keyframes scaleIn {
-    from {
-        transform: scale(0);
-    }
-    to {
-        transform: scale(1);
-    }
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 </style>
 
 </main>
 
 <script>
-    
 // ================================
 // TAB SWITCHING
 // ================================
@@ -577,7 +603,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // ================================
 const modal = document.getElementById('imageModal');
 const modalImg = document.getElementById('modalImage');
-const closeModal = document.getElementById('closeModal');
+const closeModalBtn = document.getElementById('closeModal');
 
 document.querySelectorAll('.clickable-photo').forEach(img => {
     img.addEventListener('click', () => {
@@ -586,7 +612,7 @@ document.querySelectorAll('.clickable-photo').forEach(img => {
     });
 });
 
-closeModal?.addEventListener('click', () => modal.style.display = 'none');
+closeModalBtn?.addEventListener('click', () => modal.style.display = 'none');
 modal?.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
 
 // ================================
@@ -609,6 +635,7 @@ function showSuccessModal(data) {
 
 function closeSuccessModal() {
     document.getElementById('successModal').style.display = 'none';
+    location.reload(); // Refresh to update tables
 }
 
 <?php if ($returnSuccess): ?>
@@ -616,13 +643,23 @@ showSuccessModal(<?= json_encode($returnSuccess) ?>);
 <?php endif; ?>
 
 // ================================
-// RETURN HANDLING (FIXED)
+// RETURN HANDLING
 // ================================
 let activeForm = null;
 
 function resetButton(btn, html) {
     btn.disabled = false;
     btn.innerHTML = html;
+}
+
+function closeDamageModal() {
+    document.getElementById('damageRemarksModal').style.display = 'none';
+    document.getElementById('damageRemarksText').value = '';
+    if (activeForm) {
+        const submitBtn = activeForm.querySelector('button[type="submit"]');
+        resetButton(submitBtn, '<i class="fa-solid fa-check"></i> Confirm Return');
+    }
+    activeForm = null;
 }
 
 document.querySelectorAll('.return-form').forEach(form => {
@@ -652,7 +689,7 @@ document.querySelectorAll('.return-form').forEach(form => {
         }
 
         // ================================
-        // DAMAGED → REQUIRE PHOTO
+        // DAMAGED → REQUIRE PHOTO & REMARKS
         // ================================
         if (!photoInput.files.length) {
             alert('Photo is REQUIRED for damaged items.');
@@ -661,6 +698,7 @@ document.querySelectorAll('.return-form').forEach(form => {
         }
 
         try {
+            // Upload photo first
             const fd = new FormData();
             fd.append('return_photo', photoInput.files[0]);
             fd.append('item_id', itemId);
@@ -671,19 +709,26 @@ document.querySelectorAll('.return-form').forEach(form => {
                 credentials: 'same-origin'
             });
 
-            if (!res.ok) throw new Error('Upload request failed');
+            if (!res.ok) {
+                throw new Error('Upload request failed with status ' + res.status);
+            }
 
             const data = await res.json();
-            if (!data.success) throw new Error(data.error || 'Upload failed');
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Upload failed');
+            }
 
             // Save photo ID
             form.querySelector('input[name="return_photo_id"]').value = data.id;
 
+            // Show damage remarks modal
             activeForm = form;
             document.getElementById('damageRemarksModal').style.display = 'flex';
 
         } catch (err) {
-            alert(err.message);
+            console.error('Upload error:', err);
+            alert('Failed to upload photo: ' + err.message);
             resetButton(submitBtn, originalText);
         }
     });
@@ -693,7 +738,10 @@ document.querySelectorAll('.return-form').forEach(form => {
 // DAMAGE REMARKS MODAL
 // ================================
 function saveDamageAndSubmit() {
-    if (!activeForm) return;
+    if (!activeForm) {
+        alert('No active form found.');
+        return;
+    }
 
     const remarks = document.getElementById('damageRemarksText').value.trim();
     if (!remarks) {
@@ -701,20 +749,32 @@ function saveDamageAndSubmit() {
         return;
     }
 
+    // Save remarks to form
     activeForm.querySelector('input[name="damage_remarks"]').value = remarks;
 
+    // Get the row for animation
     const row = activeForm.closest('tr');
 
+    // Close modal
     document.getElementById('damageRemarksModal').style.display = 'none';
     document.getElementById('damageRemarksText').value = '';
 
-    // remove row immediately
-    row.style.transition = 'opacity 0.3s ease';
-    row.style.opacity = '0';
-    setTimeout(() => row.remove(), 300);
+    // Animate row removal
+    if (row) {
+        row.style.transition = 'opacity 0.3s ease';
+        row.style.opacity = '0';
+        setTimeout(() => row.remove(), 300);
+    }
 
+    // Submit the form
     activeForm.submit();
     activeForm = null;
 }
 
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeDamageModal();
+    }
+});
 </script>

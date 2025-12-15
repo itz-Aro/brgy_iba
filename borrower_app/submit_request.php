@@ -25,11 +25,12 @@ try {
     $request_no = 'REQ-' . date('YmdHis');
 
     // Insert into requests table
-    $stmt = $conn->prepare("INSERT INTO requests (request_no, created_by, borrower_name, borrower_contact, borrower_address, date_needed, expected_return_date, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO requests (request_no, created_by, borrower_name, borrower_email, borrower_contact, borrower_address, date_needed, expected_return_date, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $request_no,
         1, // replace with logged-in user ID if available
         $fullname,
+        $email,
         $contact,
         $address,
         $start_date,
