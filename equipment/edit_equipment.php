@@ -115,8 +115,8 @@ if (!empty($_FILES['photo']['name'])) {
 
 :root{
   --blue:#0d47a1;
-  --blue-light:#1976d2;
-  --blue-dark:#003c8f;
+  --blue-light:#0f62e8ff;
+  --blue-dark:#083d97;
   --light-gray:#f5f7fa;
   --card-shadow:0 6px 20px rgba(15,23,42,0.08);
   --hover-shadow:0 8px 24px rgba(15,23,42,0.12);
@@ -133,13 +133,13 @@ if (!empty($_FILES['photo']['name'])) {
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color: var(--light-gray);
   color: #2c3e50;
 }
 
 .content-wrap{ 
-  margin-left:250px; 
+  margin-left:410px; 
   padding:28px; 
   max-width:900px; 
   margin-top:0;
@@ -147,7 +147,7 @@ body {
 }
 
 .top-header{ 
-  background:linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%); 
+  background-color:#0f62e8ff; 
   color:white; 
   border-radius:16px; 
   padding:32px 40px; 
@@ -188,7 +188,7 @@ body {
   height:58px; 
   border-radius:50%; 
   background:white; 
-  color:var(--warning); 
+  color:#0f62e8ff; 
   display:flex; 
   justify-content:center; 
   align-items:center; 
@@ -217,9 +217,9 @@ body {
 
 .form-card h2{ 
   margin-top:0; 
-  color:var(--warning); 
+  color:#0f62e8ff; 
   margin-bottom:24px;
-  font-size:28px;
+  font-size:22px;
   font-weight:800;
   display:flex;
   align-items:center;
@@ -227,25 +227,26 @@ body {
 }
 
 .equipment-info {
-  background:#fff8e1;
-  border-left:4px solid var(--warning);
+  background: #f8f8f8ff;
+  border-left:4px solid #0f62e8ff;
   padding:16px;
   border-radius:8px;
   margin-bottom:24px;
   font-size:14px;
-  color:#f57f17;
+    color:var(--blue-light);
+
 }
 
 .equipment-info strong {
   display:block;
-  margin-bottom:8px;
   font-size:16px;
+  color:var(--blue);
 }
 
 .equipment-info .detail {
   display:flex;
   gap:8px;
-  margin:4px 0;
+  margin:13px 0;
   align-items:center;
 }
 
@@ -262,7 +263,7 @@ body {
 .section-title {
   font-size:16px;
   font-weight:700;
-  color:var(--warning);
+  color:#0f62e8ff;
   margin-bottom:16px;
   text-transform:uppercase;
   letter-spacing:0.5px;
@@ -303,7 +304,7 @@ body {
 }
 
 .form-group label i {
-  color:var(--warning);
+  color:#0f62e8ff;
 }
 
 .required::after {
@@ -329,7 +330,7 @@ body {
 .form-group textarea:focus, 
 .form-group select:focus{ 
   outline:none;
-  border-color:var(--warning);
+  border-color:#0f62e8ff;
   background:white;
   box-shadow:0 0 0 4px rgba(255,152,0,0.1);
 }
@@ -373,7 +374,7 @@ body {
 }
 
 .file-input-label:hover {
-  border-color:var(--warning);
+  border-color:#0f62e8ff;
   background:white;
 }
 
@@ -384,7 +385,7 @@ body {
 .file-name {
   margin-top:8px;
   font-size:13px;
-  color:var(--warning);
+  color:#0f62e8ff;
   font-weight:600;
   display:flex;
   align-items:center;
@@ -430,7 +431,7 @@ body {
 .image-preview-label {
   font-size:13px;
   font-weight:600;
-  color:var(--warning);
+  color:#0f62e8ff;
   margin-bottom:8px;
   display:flex;
   align-items:center;
@@ -441,7 +442,7 @@ body {
   max-width:200px;
   max-height:200px;
   border-radius:10px;
-  border:2px solid var(--warning);
+  border:2px solid #0f62e8ff;
   object-fit:cover;
 }
 
@@ -468,7 +469,7 @@ body {
 }
 
 .submit-btn{ 
-  background:linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%); 
+  background: linear-gradient(135deg, #2d7af5, #083d97);
   color:white; 
   border:none; 
   padding:14px 28px; 
@@ -481,11 +482,12 @@ body {
   align-items:center;
   gap:8px;
   box-shadow:0 4px 12px rgba(255,152,0,0.3);
+  font-family:'Poppins',sans-serif
 }
 
 .submit-btn:hover{ 
   transform:translateY(-2px);
-  box-shadow:0 6px 16px rgba(255,152,0,0.4);
+  box-shadow:0 6px 16px rgba(0, 60, 137, 0.4);
 }
 
 .cancel-btn{ 
@@ -562,8 +564,8 @@ body {
 
     <div class="form-card">
         <h2>
-            <i class="fas fa-file-edit"></i>
-            Update Equipment Details
+            <!-- <i class="fas fa-file-edit"></i> -->
+            Equipment Details:
         </h2>
 
         <?php if($error): ?>

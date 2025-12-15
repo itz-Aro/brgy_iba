@@ -53,7 +53,7 @@ body {
     font-size: 27px;
     font-weight: 700;
     margin-bottom: 6px;
-    background: linear-gradient(135deg, #0f62e8ff 0%, #083d92 100%);
+    background: linear-gradient(135deg, #0f62e8ff 0%, #083d97 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -99,7 +99,7 @@ body {
 }
 
 .input-field input:focus {
-    border-color: #083d92;
+    border-color: #083d97;
     outline: none;
     background: white;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
@@ -131,7 +131,7 @@ button[type="submit"] {
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    background: linear-gradient(135deg, #2d7af5, #083d92);
+    background: linear-gradient(135deg, #2d7af5, #083d97);
     color: white;
     margin-top: 4px;
 }
@@ -229,7 +229,7 @@ button[type="submit"]:active {
     color: #333;
     font-size: 28px; 
     text-align: center;
-    background: linear-gradient(135deg, #2d7af5, #083d92 100%);
+    background: linear-gradient(135deg, #2d7af5, #083d97 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -266,7 +266,7 @@ button[type="submit"]:active {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #2d7af5, #083d92);
+    background: linear-gradient(135deg, #2d7af5, #083d97);
 
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);

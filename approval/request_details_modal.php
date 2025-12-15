@@ -55,14 +55,14 @@ function getStatusBadge($status) {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
     color: #333;
     overflow: hidden;
 }
 
 /* Header */
 .request-card h2 {
-    background: linear-gradient(90deg, #073a6a, #1f618d);
+    background-color:#083d97;
     color: #fff;
     margin: 0;
     padding: 20px;
@@ -95,6 +95,7 @@ function getStatusBadge($status) {
 .request-info p {
     margin: 0;
     line-height: 1.4;
+    font-size:15px;
 }
 
 .request-info strong {
@@ -155,7 +156,7 @@ function getStatusBadge($status) {
 
 <div class="request-card">
     <h2>
-        Request Details
+        Status:
         <?= getStatusBadge($request['status']) ?>
     </h2>
 
