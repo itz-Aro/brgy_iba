@@ -1,142 +1,34 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 require_once __DIR__ . '/../config/Database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
-// Set JSON header first
-header('Content-Type: application/json');
+if (!isset($_SESSION['user'])) { echo json_encode(['success'=>false,'error'=>'Not authenticated']); exit; }
+if (!isset($_FILES['return_photo']) || !isset($_POST['item_id'])) { echo json_encode(['success'=>false,'error'=>'Missing file or item_id']); exit; }
 
-// Check authentication
-try {
-    AuthMiddleware::protect(['admin', 'officials']);
-} catch (Exception $e) {
-    echo json_encode([
-        'success' => false,
-        'error' => 'Authentication required: ' . $e->getMessage()
-    ]);
-    exit;
-}
+$itemId = (int)$_POST['item_id'];
+$file = $_FILES['return_photo'];
+
+if ($file['error']!==UPLOAD_ERR_OK) { echo json_encode(['success'=>false,'error'=>'Upload error']); exit; }
+
+$allowedTypes=['image/jpeg','image/png','image/jpg','image/webp'];
+if (!in_array(mime_content_type($file['tmp_name']),$allowedTypes)) { echo json_encode(['success'=>false,'error'=>'Invalid file type']); exit; }
+if ($file['size']>5*1024*1024) { echo json_encode(['success'=>false,'error'=>'File too large']); exit; }
 
 try {
-    // Check if file was uploaded
-    if (!isset($_FILES['return_photo'])) {
-        throw new Exception('No file uploaded. Please select a photo.');
-    }
+    $db=new Database(); $conn=$db->getConnection();
+    $ext=pathinfo($file['name'],PATHINFO_EXTENSION);
+    $filename='return_'.time().'_'.uniqid().'.'.$ext;
+    $uploadDir=__DIR__.'/../uploads/returns/'; if(!is_dir($uploadDir)) mkdir($uploadDir,0755,true);
+    $dest=$uploadDir.$filename;
+    if(!move_uploaded_file($file['tmp_name'],$dest)) throw new Exception('Move failed');
 
-    $file = $_FILES['return_photo'];
-
-    // Check for upload errors
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        $errorMessages = [
-            UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize in php.ini',
-            UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE in HTML form',
-            UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
-            UPLOAD_ERR_NO_FILE => 'No file was uploaded',
-            UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
-            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
-            UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
-        ];
-        $errorMsg = $errorMessages[$file['error']] ?? 'Unknown upload error';
-        throw new Exception($errorMsg);
-    }
-
-    $itemId = $_POST['item_id'] ?? 0;
-
-    // Validate file exists
-    if (!file_exists($file['tmp_name'])) {
-        throw new Exception('Uploaded file not found.');
-    }
-
-    // Validate file type using mime_content_type
-    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    $mimeType = mime_content_type($file['tmp_name']);
-
-    if (!in_array($mimeType, $allowedTypes)) {
-        throw new Exception('Invalid file type. Only JPG, PNG, and GIF are allowed. Detected: ' . $mimeType);
-    }
-
-    // Validate file size (5MB max)
-    if ($file['size'] > 5 * 1024 * 1024) {
-        throw new Exception('File size exceeds 5MB limit. File size: ' . round($file['size'] / 1024 / 1024, 2) . 'MB');
-    }
-
-    // Create upload directory if it doesn't exist
-    $uploadDir = __DIR__ . '/../uploads/returns/';
-    if (!file_exists($uploadDir)) {
-        if (!mkdir($uploadDir, 0755, true)) {
-            throw new Exception('Failed to create upload directory: ' . $uploadDir);
-        }
-    }
-
-    // Check if directory is writable
-    if (!is_writable($uploadDir)) {
-        throw new Exception('Upload directory is not writable: ' . $uploadDir);
-    }
-
-    // Generate unique filename
-    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (empty($extension)) {
-        // Get extension from mime type
-        $mimeToExt = [
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'image/gif' => 'gif'
-        ];
-        $extension = $mimeToExt[$mimeType] ?? 'jpg';
-    }
-
-    $filename = 'return_' . time() . '_' . uniqid() . '.' . $extension;
-    $uploadPath = $uploadDir . $filename;
-
-    // Move uploaded file
-    if (!move_uploaded_file($file['tmp_name'], $uploadPath)) {
-        throw new Exception('Failed to move uploaded file to: ' . $uploadPath);
-    }
-
-    // Verify file was saved
-    if (!file_exists($uploadPath)) {
-        throw new Exception('File was not saved successfully.');
-    }
-
-    // Insert into database
-    $db = new Database();
-    $conn = $db->getConnection();
-
-    $stmt = $conn->prepare("
-        INSERT INTO return_photos (filename, upload_date) 
-        VALUES (?, NOW())
-    ");
-    
-    if (!$stmt->execute([$filename])) {
-        // If database insert fails, delete the uploaded file
-        unlink($uploadPath);
-        throw new Exception('Failed to save photo information to database.');
-    }
-
-    $photoId = $conn->lastInsertId();
-
-    echo json_encode([
-        'success' => true,
-        'id' => $photoId,
-        'filename' => $filename,
-        'message' => 'Photo uploaded successfully',
-        'file_size' => $file['size'],
-        'mime_type' => $mimeType
-    ]);
-
-} catch (Exception $e) {
-    http_response_code(400);
-    echo json_encode([
-        'success' => false,
-        'error' => $e->getMessage(),
-        'debug' => [
-            'files_received' => isset($_FILES['return_photo']),
-            'file_error' => $_FILES['return_photo']['error'] ?? 'N/A',
-            'file_size' => $_FILES['return_photo']['size'] ?? 'N/A',
-            'file_tmp' => $_FILES['return_photo']['tmp_name'] ?? 'N/A',
-            'upload_dir' => __DIR__ . '/../uploads/returns/',
-            'post_data' => array_keys($_POST)
-        ]
-    ]);
+    $stmt=$conn->prepare("INSERT INTO return_photos (borrowing_item_id, filename, uploaded_at) VALUES (?, ?, NOW())");
+    $stmt->execute([$itemId,$filename]);
+    $photoId=$conn->lastInsertId();
+    echo json_encode(['success'=>true,'id'=>$photoId,'filename'=>$filename]);
+} catch(Exception $e){
+    if(isset($dest) && file_exists($dest)) unlink($dest);
+    echo json_encode(['success'=>false,'error'=>$e->getMessage()]);
 }
-?>
