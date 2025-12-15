@@ -110,6 +110,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['item_id'])) {
         ");
         $updBorrowItem->execute([$status, $condition, $item_id]);
 
+        // ===================================
+        // ADD MAINTENANCE LOG FOR DAMAGED ITEMS
+        // ===================================
+        if ($condition === 'Damaged') {
+            $performedBy = $_SESSION['user']['id'] ?? null;
+            $returnedFrom = "Borrowing #" . $borrow['borrowing_no'] . " from " . $borrow['borrower_name'];
+            
+            $insertLog = $conn->prepare("
+                INSERT INTO maintenance_logs (
+                    equipment_id,
+                    action,
+                    returned_from,
+                    remarks,
+                    performed_by
+                ) VALUES (?, 'Marked Damaged', ?, ?, ?)
+            ");
+            $insertLog->execute([
+                $equipment_id,
+                $returnedFrom,
+                $damageRemarks,
+                $performedBy
+            ]);
+        }
+
         // Update equipment quantity for Good/Fair
         if ($condition !== 'Damaged') {
             $updEquip = $conn->prepare("
@@ -610,6 +634,24 @@ document.querySelectorAll('.return-form').forEach(form => {
         } catch(err) { alert(err.message); submitBtn.disabled=false; submitBtn.innerHTML=originalText; }
     });
 });
+
+// ================================
+// IMAGE MODAL
+// ================================
+const modal = document.getElementById('imageModal');
+const modalImg = document.getElementById('modalImage');
+const closeModalBtn = document.getElementById('closeModal');
+
+document.querySelectorAll('.clickable-photo').forEach(img => {
+    img.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        modalImg.src = img.dataset.src;
+    });
+});
+
+closeModalBtn?.addEventListener('click', () => modal.style.display = 'none');
+modal?.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+
 
 function saveDamageAndSubmit() {
     if (!activeForm) return;
