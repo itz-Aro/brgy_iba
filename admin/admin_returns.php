@@ -12,7 +12,7 @@ AuthMiddleware::protect(['admin','officials']);
 
 $db = new Database();
 $conn = $db->getConnection();
-$baseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . 'brgy_iba/uploads/returns/';
+$baseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/brgy_iba/uploads/returns/';
 
 // ========================
 // HANDLE RETURN POST
@@ -225,25 +225,6 @@ if ($returnSuccess) unset($_SESSION['return_success']);
     </div>
 </div>
 
-<!-- Error Toast -->
-<?php if ($errorMessage): ?>
-<div id="errorToast" style="position:fixed; top:80px; right:20px; background:#dc2626; color:white; padding:16px 24px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:99999; display:flex; align-items:center; gap:12px; animation: slideIn 0.3s ease;">
-    <i class="fa-solid fa-circle-exclamation"></i>
-    <span><?= htmlspecialchars($errorMessage) ?></span>
-    <button onclick="this.parentElement.remove()" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer; margin-left:8px;">&times;</button>
-</div>
-<script>
-setTimeout(() => {
-    const toast = document.getElementById('errorToast');
-    if (toast) {
-        toast.style.transition = 'opacity 0.3s ease';
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }
-}, 5000);
-</script>
-<?php endif; ?>
-
 <!-- Statistics Cards -->
 <div class="stats-container">
     <div class="stat-card due">
@@ -307,7 +288,7 @@ setTimeout(() => {
                     $today = new DateTime();
                     $isOverdue = $expectedDate < $today;
                 ?>
-                    <tr data-item-id="<?= $r['item_id'] ?>">
+                    <tr>
                         <td><strong><?= htmlspecialchars($r['borrowing_no']) ?></strong></td>
                         <td><?= htmlspecialchars($r['borrower_name']) ?></td>
                         <td><?= htmlspecialchars($r['equipment_name']) ?></td>
@@ -397,8 +378,8 @@ setTimeout(() => {
                             </span>
                         </td>
                         <td>
-                            <span class="<?= $r['condition_in'] === 'Fair' ? 'badge-warning' : 'badge-good' ?>">
-                                <i class="fa-solid fa-<?= $r['condition_in'] === 'Fair' ? 'circle-exclamation' : 'circle-check' ?>"></i>
+                            <span class="<?= $r['condition_in'] === 'Damaged' ? 'badge-damage' : ($r['condition_in'] === 'Fair' ? 'badge-warning' : 'badge-good') ?>">
+                                <i class="fa-solid fa-<?= $r['condition_in'] === 'Damaged' ? 'triangle-exclamation' : ($r['condition_in'] === 'Fair' ? 'circle-exclamation' : 'circle-check') ?>"></i>
                                 <?= htmlspecialchars($r['condition_in']) ?>
                             </span>
                         </td>
@@ -551,20 +532,20 @@ setTimeout(() => {
 
 <!-- Damaged Remarks Modal -->
 <div id="damageRemarksModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; justify-content:center; align-items:center;">
-    <div style="background:white; padding:24px; border-radius:16px; max-width:420px; width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
-        <h3 style="color:#dc2626; margin-bottom:8px;">
+    <div style="background:white; padding:24px; border-radius:16px; max-width:420px; width:100%;">
+        <h3 style="color:#dc2626;">
             <i class="fa-solid fa-triangle-exclamation"></i> Damaged Item Description
         </h3>
         <p style="font-size:0.9rem; color:#64748b; margin-bottom:12px;">
-            Please provide a detailed description of the damage:
+            Please provide a description for the damage:
         </p>
-        <textarea id="damageRemarksText" required style="width:100%; height:100px; padding:10px; border-radius:8px; border:2px solid #e2e8f0; resize:none; font-family:inherit;" placeholder="Describe the damage..."></textarea>
+        <textarea id="damageRemarksText" required style="width:100%; height:100px; padding:10px; border-radius:8px; border:2px solid #e2e8f0; resize:none;"></textarea>
         <div style="display:flex; gap:10px; margin-top:16px;">
-            <button type="button" onclick="closeDamageModal()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#e5e7eb; cursor:pointer; font-weight:500;">
+            <button type="button" onclick="closeDamageModal()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#e5e7eb;">
                 Cancel
             </button>
-            <button type="button" onclick="saveDamageAndSubmit()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#dc2626; color:white; cursor:pointer; font-weight:500;">
-                <i class="fa-solid fa-check"></i> Confirm
+            <button type="button" onclick="saveDamageAndSubmit()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#dc2626; color:white;">
+                Save Damage
             </button>
         </div>
     </div>
@@ -572,12 +553,12 @@ setTimeout(() => {
 
 <style>
 @keyframes scaleIn {
-    from { transform: scale(0); }
-    to { transform: scale(1); }
-}
-@keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
 }
 </style>
 
@@ -614,7 +595,6 @@ document.querySelectorAll('.return-form').forEach(form => {
         if (!photoInput.files.length) { alert('Photo required'); submitBtn.disabled=false; submitBtn.innerHTML=originalText; return; }
 
         try {
-            // Upload photo first
             const fd = new FormData();
             fd.append('return_photo', photoInput.files[0]);
             fd.append('item_id', itemId);
