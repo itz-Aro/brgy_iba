@@ -210,7 +210,7 @@ SELECT
     b.actual_return_date,
     e.id AS equipment_id,
     e.name AS equipment_name
-FROM b_items bi
+FROM borrowing_items bi
 JOIN borrowings b ON bi.borrowing_id = b.id
 JOIN equipment e ON bi.equipment_id = e.id
 WHERE b.status = 'Returned'
