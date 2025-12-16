@@ -41,21 +41,35 @@ $displayRole = htmlspecialchars($role);
   <!-- Statistics -->
   <div class="stats-container">
     <div class="stat-card pending">
-      <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
-      <div class="stat-value"><?= count($pending) ?></div>
-      <div class="stat-label">Pending Requests</div>
+        <div class="stat-left">
+            <div class="stat-label">Pending Requests</div>
+            <div class="stat-value"><?= count($pending) ?></div>
+        </div>
+        <div class="stat-icon">
+            <i class="fa-solid fa-clock"></i>
+        </div>
     </div>
+
     <div class="stat-card approved">
-      <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
-      <div class="stat-value"><?= count($approved) ?></div>
-      <div class="stat-label">Approved Requests</div>
+        <div class="stat-left">
+            <div class="stat-label">Approved Requests</div>
+            <div class="stat-value"><?= count($approved) ?></div>
+        </div>
+        <div class="stat-icon">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
     </div>
+
     <div class="stat-card declined">
-      <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <div class="stat-value"><?= count($declined) ?></div>
-      <div class="stat-label">Declined Requests</div>
+        <div class="stat-left">
+            <div class="stat-label">Declined Requests</div>
+            <div class="stat-value"><?= count($declined) ?></div>
+        </div>
+        <div class="stat-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
     </div>
-  </div>
+</div>
 
   <!-- Tabs -->
   <div class="tabs">
