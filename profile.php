@@ -178,6 +178,7 @@ if (isset($_POST['change_password'])) {
     margin-bottom: 12px;
     border-radius: 6px;
     border: 1px solid #ccc;
+    font-family:'Poppins', sans-serif;
 }
 
 .profile-card button {
