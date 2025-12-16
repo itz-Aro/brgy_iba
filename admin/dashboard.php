@@ -88,37 +88,45 @@ $displayRole = htmlspecialchars($role, ENT_QUOTES);
 
   <!-- Statistics Cards -->
   <div class="stats-container">
-    <div class="stat-card" aria-hidden="true" role="region">
-      <div class="stat-left">
-        <h4>Pending Requests</h4>
-        <div class="stat-number"><?= $pendingRequests ?></div>
+      <div class="stat-card pending">
+          <div class="stat-left">
+              <h4>Pending Requests</h4>
+              <div class="stat-number"><?= $pendingRequests ?></div>
+          </div>
+          <div class="stat-icon">
+              <i class="fa-solid fa-clock"></i>
+          </div>
       </div>
-      <div><i class="fa-solid fa-clock"></i></div>
-    </div>
 
-    <div class="stat-card">
-      <div class="stat-left">
-        <h4>Ongoing Borrowings</h4>
-        <div class="stat-number"><?= $ongoingBorrowings ?></div>
+      <div class="stat-card ongoing">
+          <div class="stat-left">
+              <h4>Ongoing Borrowings</h4>
+              <div class="stat-number"><?= $ongoingBorrowings ?></div>
+          </div>
+          <div class="stat-icon">
+              <i class="fas fa-people-carry"></i>
+          </div>
       </div>
-      <div><i class="fas fa-people-carry"></i></div>
-    </div>
 
-    <div class="stat-card">
-      <div class="stat-left">
-        <h4>Items Due for Return</h4>
-        <div class="stat-number"><?= $itemsDue ?></div>
+      <div class="stat-card returned">
+          <div class="stat-left">
+              <h4>Items Due for Return</h4>
+              <div class="stat-number"><?= $itemsDue ?></div>
+          </div>
+          <div class="stat-icon">
+              <i class="fa-solid fa-calendar-days"></i>
+          </div>
       </div>
-      <div><i class="fa-solid fa-calendar-days"></i></div>
-    </div>
 
-    <div class="stat-card">
-      <div class="stat-left">
-        <h4>Total Damage Reports</h4>
-        <div class="stat-number"><?= $damagedEquipment ?></div>
+      <div class="stat-card damaged">
+          <div class="stat-left">
+              <h4>Total Damage Reports</h4>
+              <div class="stat-number"><?= $damagedEquipment ?></div>
+          </div>
+          <div class="stat-icon">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
       </div>
-      <div><i class="fa-solid fa-triangle-exclamation"></i></div>
-    </div>
   </div>
 
   <div class="main-grid">

@@ -4,7 +4,6 @@
 }
 
 body {
-    
     background: #f1f5f9;
     margin: 0;
 }
@@ -90,6 +89,7 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* Unified Stats Container & Cards - Works for both pages */
 .stats-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -104,6 +104,10 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     border: 2px solid #f1f5f9;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
 }
 
 .stat-card:hover {
@@ -112,7 +116,34 @@ body {
     border-color: #083d97;
 }
 
-.stat-card .stat-icon {
+/* Left side - Text content */
+.stat-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.stat-left h4,
+.stat-label {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.stat-number,
+.stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+}
+
+/* Right side - Icon */
+.stat-icon {
     width: 56px;
     height: 56px;
     border-radius: 14px;
@@ -120,35 +151,80 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    margin-bottom: 16px;
+    flex-shrink: 0;
 }
 
-.stat-card.due .stat-icon {
+/* Legacy support for bare icon divs */
+.stat-card > div > i {
+    font-size: 1.5rem;
+    border-radius: 14px;
+    padding: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+}
+
+/* Color variants for different card types */
+.stat-card.pending .stat-icon,
+.stat-card.pending > div > i {
     background: linear-gradient(135deg, #fef3c7, #fde68a);
     color: #d97706;
 }
 
-.stat-card.returned .stat-icon {
+.stat-card.due .stat-icon,
+.stat-card.due > div > i {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #d97706;
+}
+
+.stat-card.ongoing .stat-icon,
+.stat-card.ongoing > div > i {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+}
+
+.stat-card.returned .stat-icon,
+.stat-card.returned > div > i {
     background: linear-gradient(135deg, #d1fae5, #a7f3d0);
     color: #059669;
 }
 
-.stat-card.damaged .stat-icon {
-    background:linear-gradient(135deg,#fee2e2,#fecaca); 
-    color:#dc2626; 
+.stat-card.damaged .stat-icon,
+.stat-card.damaged > div > i {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
 }
 
-.stat-card .stat-value {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #1e293b;
-    margin-bottom: 4px;
+/* Default icon style (if no class specified) */
+.stat-card .stat-icon:not(.pending):not(.due):not(.ongoing):not(.returned):not(.damaged),
+.stat-card > div > i {
+    background: linear-gradient(135deg, #083d92, #0f62e8ff);
+    color: white;
 }
 
-.stat-card .stat-label {
-    font-size: 0.875rem;
-    color: #64748b;
-    font-weight: 600;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .stat-icon,
+    .stat-card > div > i {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+    
+    .stat-number,
+    .stat-value {
+        font-size: 1.75rem;
+    }
 }
 
 .tabs { 
@@ -206,7 +282,7 @@ body {
     border-radius: 20px; 
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     overflow: hidden;
-    border: 2px solid #dddddd;
+    border: 2px solid #f1f5f9;
 }
 
 .table-card table { 
@@ -227,7 +303,7 @@ body {
 
 .table-card td { 
     padding: 18px 20px; 
-    border-bottom: 1px solid #afafaf;
+    border-bottom: 1px solid #e2e8f0;
     vertical-align: middle;
     font-size: 0.9rem;
     color: #334155;

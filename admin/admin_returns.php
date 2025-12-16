@@ -252,25 +252,33 @@ if ($returnSuccess) unset($_SESSION['return_success']);
 <!-- Statistics Cards -->
 <div class="stats-container">
     <div class="stat-card due">
+        <div class="stat-left">
+            <div class="stat-label">Items Due for Return</div>
+            <div class="stat-value"><?= count($dueItems) ?></div>
+        </div>
         <div class="stat-icon">
             <i class="fa-solid fa-clock"></i>
         </div>
-        <div class="stat-value"><?= count($dueItems) ?></div>
-        <div class="stat-label">Items Due for Return</div>
     </div>
+
     <div class="stat-card returned">
+        <div class="stat-left">
+            <div class="stat-label">Successfully Returned</div>
+            <div class="stat-value"><?= count($returnedItems) ?></div>
+        </div>
         <div class="stat-icon">
             <i class="fa-solid fa-circle-check"></i>
         </div>
-        <div class="stat-value"><?= count($returnedItems) ?></div>
-        <div class="stat-label">Successfully Returned</div>
     </div>
-     <div class="stat-card damaged">
+
+    <div class="stat-card damaged">
+        <div class="stat-left">
+            <div class="stat-label">Marked Damaged Returned</div>
+            <div class="stat-value"><?= count($damagedItems) ?></div>
+        </div>
         <div class="stat-icon">
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
-        <div class="stat-value"><?= count($damagedItems) ?></div>
-        <div class="stat-label">Marked Damaged Returned</div>
     </div>
 </div>
 
