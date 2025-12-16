@@ -373,7 +373,7 @@ body {
 }
 
 .submit-btn{ 
-  background:linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%); 
+ background:linear-gradient(135deg, var(--success) 0%, #66bb6a 100%);  
   color:white; 
   border:none; 
   padding:14px 28px; 
@@ -493,8 +493,8 @@ body {
       Update Equipment
     </div>
     <div class="admin-area">
-       <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
-      <div class="avatar">AD</div>
+      <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
+      <div class="avatar">OF</div>
         </div>
     </div>
   </div>

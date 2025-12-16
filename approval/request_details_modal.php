@@ -164,7 +164,7 @@ function getStatusBadge($status) {
         <p><strong>Borrower:</strong> <?= htmlspecialchars($request['borrower_name']) ?></p>
         <p><strong>Request #:</strong> <?= htmlspecialchars($request['request_no']) ?></p>
         <p><strong>Created By:</strong> <?= htmlspecialchars($request['creator_name']) ?></p>
-        <p><strong>Contact:</strong> <?= htmlspecialchars($request['borrower_contact']) ?></p>
+        <p><strong>Email:</strong> <?= htmlspecialchars($request['borrower_email']) ?></p>
         <p><strong>Date Needed:</strong> <?= htmlspecialchars($request['date_needed']) ?></p>
         <p><strong>Expected Return:</strong> <?= htmlspecialchars($request['expected_return_date']) ?></p>
         <p style="grid-column: span 2;"><strong>Address:</strong> <?= htmlspecialchars($request['borrower_address']) ?></p>

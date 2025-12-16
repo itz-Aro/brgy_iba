@@ -113,6 +113,7 @@ $displayRole = htmlspecialchars($role);
 
 /* Stat Card Base */
 .stat-card {
+    margin-top:18px;
     background: white;
     border-radius: 14px;
     padding: 22px;
@@ -123,7 +124,7 @@ $displayRole = htmlspecialchars($role);
     display: flex;
     flex-direction: column;
     gap: 14px;
-    min-height: 160px;
+    min-height: 10px;
 }
 
 .stat-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--blue); }
@@ -332,8 +333,8 @@ $displayRole = htmlspecialchars($role);
   <div class="top-header">
     <div class="title">Dashboard</div>
     <div class="admin-area">
-      <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($displayRole)) ?>!</div>
-      <div class="avatar">AD</div>
+      <div class="greeting">Hello, <?= htmlspecialchars(strtoupper($role)) ?>!</div>
+      <div class="avatar">OF</div>
     </div>
   </div>
 

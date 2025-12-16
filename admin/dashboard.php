@@ -211,8 +211,22 @@ $displayRole = htmlspecialchars($role, ENT_QUOTES);
 </div>
 
 <script>
-const topLabels = <?= json_encode($chartLabels) ?>;
-const topData   = <?= json_encode($chartData) ?>;
+const rawLabels = <?= json_encode($chartLabels) ?>;
+const rawData   = <?= json_encode($chartData) ?>;
+
+// Combine, sort by value DESC, take top 5
+const combined = rawLabels.map((label, i) => ({
+  label,
+  value: rawData[i]
+}));
+
+combined.sort((a, b) => b.value - a.value);
+
+const topFive = combined.slice(0, 5);
+
+const topLabels = topFive.map(item => item.label);
+const topData   = topFive.map(item => item.value);
+
 
 const ctx = document.getElementById('borrowChart').getContext('2d');
 
